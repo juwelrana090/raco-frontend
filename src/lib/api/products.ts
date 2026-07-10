@@ -1,5 +1,35 @@
-import { apiClient } from '@/lib/api/apiClient';
-import type { IProduct, IProductListResponse, IProductFilters } from '../types';
+import { apiClient } from './apiClient';
+
+export interface IProduct {
+  id: string;
+  name: string;
+  sku: string;
+  description: string | null;
+  price: number; // stored in poisha (100 poisha = 1 BDT)
+  stock: number;
+  categoryId: string;
+  category: {
+    id: string;
+    name: string;
+  };
+  imageUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IProductListResponse {
+  products: IProduct[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface IProductFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  categoryId?: string;
+}
 
 function buildQuery(filters?: Record<string, any>): string {
   if (!filters) return '';
@@ -11,15 +41,20 @@ function buildQuery(filters?: Record<string, any>): string {
   return q ? `?${q}` : '';
 }
 
-export const productsApi = {
+export const productApi = {
+  // GET /products (public — no auth needed for listing)
   getAll: (filters?: IProductFilters) =>
     apiClient.get<IProductListResponse>(`/products${buildQuery(filters)}`),
 
   getById: (id: string) => apiClient.get<IProduct>(`/products/${id}`),
 
+  // GET /products/:id/recommendations
   getRecommendations: (id: string, limit?: number) =>
     apiClient.get<any>(`/products/${id}/recommendations${limit ? `?limit=${limit}` : ''}`),
 
+  // POST /products — Admin only
+  // Fields: sku*, name*, description, price*, stock*, imageUrl, categoryId*
+  // NO 'status' field in backend DTO
   create: (data: {
     sku: string;
     name: string;
@@ -30,6 +65,7 @@ export const productsApi = {
     categoryId: string;
   }) => apiClient.post<IProduct>('/products', data),
 
+  // PATCH /products/:id — Admin only
   update: (id: string, data: {
     sku?: string;
     name?: string;
@@ -40,8 +76,11 @@ export const productsApi = {
     categoryId?: string;
   }) => apiClient.patch<IProduct>(`/products/${id}`, data),
 
+  // DELETE /products/:id — Admin only
   delete: (id: string) => apiClient.delete<void>(`/products/${id}`),
 
+  // POST /products/:id/image — multipart/form-data, Admin only
+  // Must use raw fetch — apiClient forces application/json Content-Type
   uploadImage: async (id: string, file: File): Promise<{ imageUrl: string }> => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
     const token = typeof document !== 'undefined'
@@ -59,5 +98,6 @@ export const productsApi = {
     return json.data;
   },
 
+  // DELETE /products/:id/image — Admin only
   deleteImage: (id: string) => apiClient.delete<void>(`/products/${id}/image`),
 };

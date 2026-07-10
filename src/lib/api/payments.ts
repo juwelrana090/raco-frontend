@@ -1,17 +1,26 @@
-import { apiClient } from '@/lib/api/apiClient';
-import type { IPayment } from '../types';
+import { apiClient } from './apiClient';
+
+export interface IPayment {
+  id: string;
+  orderId: string;
+  userId: string;
+  amount: number; // in poisha
+  provider: 'STRIPE' | 'BKASH';
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  transactionId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export const paymentsApi = {
-  getAll: (_filters?: { search?: string; status?: string; provider?: string; page?: number; limit?: number }) => {
-    console.warn('GET /payments list endpoint not yet available in backend');
-    return Promise.resolve({ payments: [] as IPayment[], total: 0, page: 1, limit: 10, totalPages: 0 });
-  },
-
+  // GET /payments/:id
   getById: (id: string) => apiClient.get<IPayment>(`/payments/${id}`),
 
+  // GET /payments/order/:orderId — get all payments for an order
   getByOrderId: (orderId: string) =>
     apiClient.get<IPayment[]>(`/payments/order/${orderId}`),
 
+  // POST /payments — create payment (called by checkout flow)
   create: (orderId: string, provider: 'STRIPE' | 'BKASH') =>
     apiClient.post<any>('/payments', { orderId, provider }),
 

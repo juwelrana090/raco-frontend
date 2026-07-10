@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { useFetchCategories } from "../hooks/useFetchCategories";
 import type { ICategory } from "../types";
 
@@ -21,8 +21,8 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
   return (
     <CategoriesContext.Provider
       value={{
-        categories: data?.categories ?? [],
-        total: data?.total ?? 0,
+        categories: data ?? [],
+        total: data?.length ?? 0,
         isLoading,
         search,
         setSearch,

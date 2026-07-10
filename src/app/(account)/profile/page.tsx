@@ -84,7 +84,7 @@ export default function ProfilePage() {
             />
             {profileForm.touched.name && profileForm.errors.name && (
               <p className="mt-1 text-xs text-red-500">
-                {profileForm.errors.name}
+                {String(profileForm.errors.name)}
               </p>
             )}
           </div>

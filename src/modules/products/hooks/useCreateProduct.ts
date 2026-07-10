@@ -6,7 +6,19 @@ export function useCreateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: productsApi.create,
+    mutationFn: (data: {
+      sku: string;
+      name: string;
+      description?: string;
+      price: number;
+      stock: number;
+      imageUrl?: string;
+      categoryId: string;
+      status?: string;
+    }) => {
+      const { status: _status, ...payload } = data;
+      return productsApi.create(payload);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Product created successfully');

@@ -4,6 +4,7 @@ export interface IUser {
   email: string;
   role: 'USER' | 'ADMIN';
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface IAuthResponse {
