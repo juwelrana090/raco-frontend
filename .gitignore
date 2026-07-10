@@ -54,3 +54,15 @@ next-env.d.ts
 .claude/settings.local.json
 .claude/tasks/eod/
 
+# Ignore all type of compressed files
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z
+*.gz
+*.bz2
+*.xz
+*.tgz
+*.tar.xz
+*.tar.bz2

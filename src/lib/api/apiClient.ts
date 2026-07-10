@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie';
+
 interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -26,7 +28,7 @@ class ApiClient {
 
   private getToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('raco_token');
+      return Cookies.get('raco_token') ?? null;
     }
     return null;
   }

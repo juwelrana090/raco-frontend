@@ -13,7 +13,12 @@
       "Write(.claude/commands/**)",
       "mcp__filesystem__directory_tree",
       "Bash(pnpm add *)",
-      "Bash(pnpm tsc *)"
+      "Bash(pnpm tsc *)",
+      "Bash(pnpm dev *)",
+      "mcp__playwright__browser_navigate",
+      "Bash(curl -s http://localhost:3000/auth/login)",
+      "Bash(curl -sI http://localhost:3000/)",
+      "Bash(curl -sI http://localhost:3000/admin/dashboard)"
     ],
     "deny": [
       "Write(~/**)",

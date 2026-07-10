@@ -1,0 +1,75 @@
+"use client";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { useFetchProducts } from "../hooks/useFetchProducts";
+import type { IProduct, IProductFilters } from "../types";
+
+interface ProductsContextValue {
+  products: IProduct[];
+  total: number;
+  page: number;
+  totalPages: number;
+  isLoading: boolean;
+  filters: IProductFilters;
+  setFilters: (filters: IProductFilters) => void;
+  setSearch: (search: string) => void;
+  setStatus: (status: string) => void;
+  setCategory: (categoryId: string) => void;
+  setPage: (page: number) => void;
+  refetch: () => void;
+}
+
+const ProductsContext = createContext<ProductsContextValue | null>(null);
+
+export function ProductsProvider({ children }: { children: ReactNode }) {
+  const [filters, setFilters] = useState<IProductFilters>({
+    page: 1,
+    limit: 10,
+  });
+
+  const { data, isLoading, refetch } = useFetchProducts(filters);
+
+  const setSearch = useCallback((search: string) => {
+    setFilters((prev) => ({ ...prev, search, page: 1 }));
+  }, []);
+
+  const setStatus = useCallback((status: string) => {
+    setFilters((prev) => ({ ...prev, status, page: 1 }));
+  }, []);
+
+  const setCategory = useCallback((categoryId: string) => {
+    setFilters((prev) => ({ ...prev, categoryId, page: 1 }));
+  }, []);
+
+  const setPage = useCallback((page: number) => {
+    setFilters((prev) => ({ ...prev, page }));
+  }, []);
+
+  return (
+    <ProductsContext.Provider
+      value={{
+        products: data?.products ?? [],
+        total: data?.total ?? 0,
+        page: data?.page ?? 1,
+        totalPages: data?.totalPages ?? 0,
+        isLoading,
+        filters,
+        setFilters,
+        setSearch,
+        setStatus,
+        setCategory,
+        setPage,
+        refetch,
+      }}
+    >
+      {children}
+    </ProductsContext.Provider>
+  );
+}
+
+export function useProducts() {
+  const context = useContext(ProductsContext);
+  if (!context) {
+    throw new Error("useProducts must be used within a ProductsProvider");
+  }
+  return context;
+}
