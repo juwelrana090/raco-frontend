@@ -1,10 +1,11 @@
-"use client";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+'use client';
+import Link from 'next/link';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-export default function CheckoutSuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get("orderId");
+  const orderId = searchParams.get('orderId');
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-20 text-center">
@@ -25,6 +26,7 @@ export default function CheckoutSuccessPage() {
           </svg>
         </div>
       </div>
+
       <h2 className="text-2xl font-bold text-gray-800 dark:text-white/90">
         Payment Successful!
       </h2>
@@ -33,12 +35,13 @@ export default function CheckoutSuccessPage() {
       </p>
       {orderId && (
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          Order{" "}
+          Order{' '}
           <span className="font-mono text-gray-700 dark:text-gray-300">
             #{orderId.slice(0, 8)}
           </span>
         </p>
       )}
+
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link
           href="/orders"
@@ -54,5 +57,19 @@ export default function CheckoutSuccessPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-7xl px-4 py-20 flex justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-500 border-t-transparent" />
+        </div>
+      }
+    >
+      <SuccessContent />
+    </Suspense>
   );
 }
