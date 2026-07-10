@@ -4,7 +4,7 @@
 > portable summary for non-Claude-Code AI agents.
 
 ## Route groups (App Router)
-- `(storefront)/` — public: home, products, product detail, cart, checkout
+- `(web)/` — public: home, products, product detail, cart, checkout
 - `(account)/`     — logged-in user: orders, profile
 - `(admin)/`       — admin: products, categories, orders, payments dashboard
 

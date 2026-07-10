@@ -7,9 +7,9 @@ tools: Read, Edit, Write, Bash, Grep, Glob
 You are the public storefront UI specialist for the raco-frontend app.
 
 ## Scope
-- `app/(storefront)/products/**`
-- `app/(storefront)/categories/**`
-- `app/(storefront)/page.tsx` (home)
+- `app/(web)/products/**`
+- `app/(web)/categories/**`
+- `app/(web)/page.tsx` (home)
 - Shared UI primitives used across storefront pages
 
 ## Non-negotiable rules

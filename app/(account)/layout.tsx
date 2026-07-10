@@ -5,6 +5,7 @@ import AuthGuard from "@/lib/auth/AuthGuard";
 import StorefrontHeader from "@/shared/components/storefront/StorefrontHeader";
 import Footer from "@/shared/components/storefront/Footer";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
+import { ThemeProvider } from "@/shared/context/ThemeContext";
 
 const navLinks = [
   { href: "/account/dashboard", label: "Dashboard" },
@@ -37,32 +38,34 @@ export default function AccountLayout({
 }) {
   return (
     <AuthGuard>
-      <QueryProvider>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-          <StorefrontHeader />
-          <div className="flex-1 mx-auto max-w-7xl w-full px-4 py-8">
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* Side nav */}
-              <aside className="w-full lg:w-56 shrink-0">
-                <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-                  <nav className="flex flex-col gap-1">
-                    {navLinks.map((link) => (
-                      <SideNavItem
-                        key={link.href}
-                        href={link.href}
-                        label={link.label}
-                      />
-                    ))}
-                  </nav>
-                </div>
-              </aside>
-              {/* Main content */}
-              <main className="flex-1">{children}</main>
+      <ThemeProvider>
+        <QueryProvider>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+            <StorefrontHeader />
+            <div className="flex-1 mx-auto max-w-7xl w-full px-4 py-8">
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* Side nav */}
+                <aside className="w-full lg:w-56 shrink-0">
+                  <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+                    <nav className="flex flex-col gap-1">
+                      {navLinks.map((link) => (
+                        <SideNavItem
+                          key={link.href}
+                          href={link.href}
+                          label={link.label}
+                        />
+                      ))}
+                    </nav>
+                  </div>
+                </aside>
+                {/* Main content */}
+                <main className="flex-1">{children}</main>
+              </div>
             </div>
+            <Footer />
           </div>
-          <Footer />
-        </div>
-      </QueryProvider>
+        </QueryProvider>
+      </ThemeProvider>
     </AuthGuard>
   );
 }

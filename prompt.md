@@ -298,7 +298,7 @@ export const formatPrice = (poisha: number): string => {
 // Link to /shop/[id]
 ```
 
-## app/(storefront)/layout.tsx
+## app/(web)/layout.tsx
 
 ```tsx
 import StorefrontHeader from "@/shared/components/storefront/StorefrontHeader";
@@ -321,7 +321,7 @@ export default function StorefrontLayout({ children }) {
 }
 ```
 
-## app/(storefront)/page.tsx — Home
+## app/(web)/page.tsx — Home
 
 ```tsx
 // Hero section:
@@ -342,7 +342,7 @@ export default function StorefrontLayout({ children }) {
 // Each links to /shop?category=[id]
 ```
 
-## app/(storefront)/shop/page.tsx — Product Listing
+## app/(web)/shop/page.tsx — Product Listing
 
 ```tsx
 // Page heading: "Shop" + product count
@@ -357,7 +357,7 @@ export default function StorefrontLayout({ children }) {
 // URL params: ?page=1&search=&category=
 ```
 
-## app/(storefront)/shop/[id]/page.tsx — Product Detail
+## app/(web)/shop/[id]/page.tsx — Product Detail
 
 ```tsx
 // Two column layout: lg:grid-cols-2 gap-8
@@ -380,7 +380,7 @@ export default function StorefrontLayout({ children }) {
 // GET /products/:id
 ```
 
-## app/(storefront)/cart/page.tsx — Cart
+## app/(web)/cart/page.tsx — Cart
 
 ```tsx
 // If empty:
@@ -409,7 +409,7 @@ export default function StorefrontLayout({ children }) {
 //   → /checkout
 ```
 
-## app/(storefront)/checkout/page.tsx — Checkout
+## app/(web)/checkout/page.tsx — Checkout
 
 ```tsx
 // If not logged in: redirect to /auth/login?redirect=/checkout
@@ -437,7 +437,7 @@ export default function StorefrontLayout({ children }) {
 //     5. On error → toast.error(message)
 ```
 
-## app/(storefront)/checkout/success/page.tsx
+## app/(web)/checkout/success/page.tsx
 
 ```tsx
 // Centered content py-20
@@ -450,7 +450,7 @@ export default function StorefrontLayout({ children }) {
 //   "Continue Shopping" → /shop (outline)
 ```
 
-## app/(storefront)/checkout/failed/page.tsx
+## app/(web)/checkout/failed/page.tsx
 
 ```tsx
 // Centered content py-20

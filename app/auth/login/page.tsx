@@ -23,7 +23,7 @@ export default function LoginPage() {
           </div>
         </div>
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Sign in to Raco</h2>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">E-commerce admin panel</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Sign in to your account</p>
       </div>
 
       <div className="rounded-2xl border border-gray-200 bg-white p-8 dark:border-gray-800 dark:bg-gray-900">
@@ -38,7 +38,17 @@ export default function LoginPage() {
               const res = await authApi.login(values.email, values.password);
               authStore.setAuth(res.user, res.accessToken, res.refreshToken);
               toast.success('Login successful!');
-              router.push('/admin/dashboard');
+
+              const params = new URLSearchParams(window.location.search);
+              const redirect = params.get('redirect');
+
+              if (redirect) {
+                router.push(redirect);
+              } else if (res.user.role === 'ADMIN') {
+                router.push('/admin/dashboard');
+              } else {
+                router.push('/');
+              }
             } catch (err) {
               toast.error(err instanceof Error ? err.message : 'Login failed');
             } finally {
