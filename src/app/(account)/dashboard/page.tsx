@@ -8,9 +8,9 @@ import { formatPrice } from "@/shared/utils/formatPrice";
 import Badge from "@/shared/components/ui/badge/Badge";
 
 const statusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  paid: "success",
-  canceled: "error",
+  PENDING: "warning",
+  PAID: "success",
+  CANCELED: "error",
 };
 
 export default function AccountDashboardPage() {
@@ -28,16 +28,25 @@ export default function AccountDashboardPage() {
 
   const { data: pendingData } = useQuery({
     queryKey: ["account-orders-pending"],
-    queryFn: () => accountApi.getMyOrders({ status: "pending", limit: 1 }),
+    queryFn: () => accountApi.getMyOrders({ status: "PENDING", limit: 1 }),
   });
 
-  const totalOrders = (allOrdersData as any)?.total ?? 0;
-  const pendingOrders = (pendingData as any)?.total ?? 0;
-  const recentOrders: any[] = (recentOrdersData as any)?.items ?? [];
+  const allOrders = Array.isArray(allOrdersData)
+    ? (allOrdersData as any[])
+    : [];
+  const pendingOrdersList = Array.isArray(pendingData)
+    ? (pendingData as any[])
+    : [];
+  const recentOrders: any[] = Array.isArray(recentOrdersData)
+    ? (recentOrdersData as any[])
+    : [];
+
+  const totalOrders = allOrders.length;
+  const pendingOrders = pendingOrdersList.length;
 
   const totalSpent = recentOrders
-    .filter((o) => o.status === "paid")
-    .reduce((sum, o) => sum + (o.total ?? 0), 0);
+    .filter((o) => o.status === "PAID")
+    .reduce((sum, o) => sum + (o.totalAmount ?? 0), 0);
 
   return (
     <div className="space-y-6">
@@ -121,14 +130,14 @@ export default function AccountDashboardPage() {
                   {recentOrders.map((order) => (
                     <tr key={order.id}>
                       <td className="py-3 font-mono text-xs text-gray-500 dark:text-gray-400">
-                        #{order.shortId ?? order.id?.slice(0, 8)}
+                        #{order.id?.slice(0, 8)}
                       </td>
                       <td className="py-3 font-medium text-gray-800 dark:text-white/90">
-                        {formatPrice(order.total)}
+                        {formatPrice(order.totalAmount ?? 0)}
                       </td>
                       <td className="py-3">
                         <Badge color={statusColor[order.status] ?? "light"}>
-                          {order.status}
+                          {order.status?.toLowerCase()}
                         </Badge>
                       </td>
                       <td className="py-3 text-gray-500 dark:text-gray-400">
@@ -136,7 +145,7 @@ export default function AccountDashboardPage() {
                       </td>
                       <td className="py-3">
                         <Link
-                          href={`/account/orders/${order.id}`}
+                          href={`/orders/${order.id}`}
                           className="text-brand-500 hover:text-brand-600"
                         >
                           View
@@ -149,7 +158,7 @@ export default function AccountDashboardPage() {
             </div>
             <div className="mt-4 text-right">
               <Link
-                href="/account/orders"
+                href="/orders"
                 className="text-sm text-brand-500 hover:text-brand-600"
               >
                 View all orders →

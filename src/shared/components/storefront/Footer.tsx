@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -14,12 +14,16 @@ export default function Footer() {
               <span className="text-lg font-bold text-white">Raco</span>
             </div>
             <p className="text-sm leading-relaxed text-gray-400 max-w-xs">
-              Quality products, competitive prices, and exceptional service. Your one-stop shop for everything you need.
+              Quality products, competitive prices, and exceptional service.
+              Your one-stop shop for everything you need.
             </p>
             {/* Payment icons */}
             <div className="mt-6 flex items-center gap-3">
-              {['💳', '📱'].map((icon, i) => (
-                <div key={i} className="flex h-8 w-12 items-center justify-center rounded-lg bg-gray-800 border border-gray-700 text-sm">
+              {["💳", "📱"].map((icon, i) => (
+                <div
+                  key={i}
+                  className="flex h-8 w-12 items-center justify-center rounded-lg bg-gray-800 border border-gray-700 text-sm"
+                >
                   {icon}
                 </div>
               ))}
@@ -29,16 +33,21 @@ export default function Footer() {
 
           {/* Shop links */}
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">Shop</h4>
+            <h4 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">
+              Shop
+            </h4>
             <ul className="space-y-3">
               {[
-                { href: '/shop', label: 'All Products' },
-                { href: '/shop?status=ACTIVE', label: 'New Arrivals' },
-                { href: '/shop', label: 'Best Sellers' },
-                { href: '/cart', label: 'My Cart' },
+                { href: "/shop", label: "All Products" },
+                { href: "/shop?status=ACTIVE", label: "New Arrivals" },
+                { href: "/shop", label: "Best Sellers" },
+                { href: "/cart", label: "My Cart" },
               ].map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm hover:text-white transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm hover:text-white transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -48,16 +57,21 @@ export default function Footer() {
 
           {/* Account links */}
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">Account</h4>
+            <h4 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">
+              Account
+            </h4>
             <ul className="space-y-3">
               {[
-                { href: '/auth/login', label: 'Login' },
-                { href: '/auth/register', label: 'Register' },
-                { href: '/account/orders', label: 'My Orders' },
-                { href: '/account/profile', label: 'Profile' },
+                { href: "/auth/login", label: "Login" },
+                { href: "/auth/register", label: "Register" },
+                { href: "/orders", label: "My Orders" },
+                { href: "/profile", label: "Profile" },
               ].map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm hover:text-white transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm hover:text-white transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -67,16 +81,21 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">Support</h4>
+            <h4 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">
+              Support
+            </h4>
             <ul className="space-y-3">
               {[
-                { label: 'Help Center', href: '#' },
-                { label: 'Return Policy', href: '#' },
-                { label: 'Privacy Policy', href: '#' },
-                { label: 'Terms of Service', href: '#' },
+                { label: "Help Center", href: "#" },
+                { label: "Return Policy", href: "#" },
+                { label: "Privacy Policy", href: "#" },
+                { label: "Terms of Service", href: "#" },
               ].map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm hover:text-white transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm hover:text-white transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -87,7 +106,9 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-gray-500">© 2026 Raco. All rights reserved.</p>
+          <p className="text-xs text-gray-500">
+            © 2026 Raco. All rights reserved.
+          </p>
           <p className="text-xs text-gray-500">Made with ❤️ in Bangladesh</p>
         </div>
       </div>

@@ -22,7 +22,6 @@ const validationSchema = Yup.object({
   stock: Yup.number()
     .min(0, "Stock cannot be negative")
     .required("Stock is required"),
-  status: Yup.string().required("Status is required"),
   categoryId: Yup.string().required("Category is required"),
 });
 
@@ -32,12 +31,15 @@ interface ProductFormValues {
   description: string;
   price: number;
   stock: number;
-  status: "active" | "inactive";
   categoryId: string;
 }
 
 interface EditProductFormProps {
-  categories: Array<{ id: string; name: string; children?: Array<{ id: string; name: string }> }>;
+  categories: Array<{
+    id: string;
+    name: string;
+    children?: Array<{ id: string; name: string }>;
+  }>;
 }
 
 export default function EditProductForm({ categories }: EditProductFormProps) {
@@ -58,7 +60,7 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
 
   const handleSubmit = async (
     values: ProductFormValues,
-    { setSubmitting }: FormikHelpers<ProductFormValues>
+    { setSubmitting }: FormikHelpers<ProductFormValues>,
   ) => {
     try {
       await updateProduct.mutateAsync({ id: productId, data: values });
@@ -93,7 +95,6 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
         description: product.description ?? "",
         price: product.price,
         stock: product.stock,
-        status: product.status,
         categoryId: product.categoryId,
       }}
       validationSchema={validationSchema}
@@ -110,7 +111,11 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Name *
                 </label>
-                <Field name="name" className={inputClass} placeholder="Product name" />
+                <Field
+                  name="name"
+                  className={inputClass}
+                  placeholder="Product name"
+                />
                 {errors.name && touched.name && (
                   <p className="mt-1 text-xs text-error-500">{errors.name}</p>
                 )}
@@ -119,7 +124,11 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   SKU *
                 </label>
-                <Field name="sku" className={inputClass} placeholder="e.g. PRD-001" />
+                <Field
+                  name="sku"
+                  className={inputClass}
+                  placeholder="e.g. PRD-001"
+                />
                 {errors.sku && touched.sku && (
                   <p className="mt-1 text-xs text-error-500">{errors.sku}</p>
                 )}
@@ -137,7 +146,7 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
                 placeholder="Product description"
               />
             </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Price (Taka) *
@@ -166,15 +175,6 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
                   <p className="mt-1 text-xs text-error-500">{errors.stock}</p>
                 )}
               </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Status
-                </label>
-                <Field as="select" name="status" className={selectClass}>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </Field>
-              </div>
             </div>
           </div>
 
@@ -196,7 +196,9 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
                 ))}
               </Field>
               {errors.categoryId && touched.categoryId && (
-                <p className="mt-1 text-xs text-error-500">{errors.categoryId}</p>
+                <p className="mt-1 text-xs text-error-500">
+                  {errors.categoryId}
+                </p>
               )}
             </div>
           </div>

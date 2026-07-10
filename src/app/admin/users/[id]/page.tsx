@@ -11,9 +11,9 @@ import Badge from "@/shared/components/ui/badge/Badge";
 import type { ColumnsType } from "antd/es/table";
 
 const statusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  paid: "success",
-  canceled: "error",
+  PENDING: "warning",
+  PAID: "success",
+  CANCELED: "error",
 };
 
 function formatPrice(price: number): string {
@@ -23,10 +23,10 @@ function formatPrice(price: number): string {
 const orderColumns: ColumnsType<any> = [
   {
     title: "Order ID",
-    dataIndex: "shortId",
-    render: (shortId: string) => (
-      <span className="text-sm font-medium text-gray-800 dark:text-white/90">
-        #{shortId}
+    dataIndex: "id",
+    render: (id: string) => (
+      <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
+        #{id?.slice(0, 8)}
       </span>
     ),
   },
@@ -41,7 +41,7 @@ const orderColumns: ColumnsType<any> = [
   },
   {
     title: "Total",
-    dataIndex: "total",
+    dataIndex: "totalAmount",
     render: (total: number) => (
       <span className="text-sm font-medium text-gray-800 dark:text-white/90">
         {formatPrice(total)}
@@ -52,7 +52,9 @@ const orderColumns: ColumnsType<any> = [
     title: "Status",
     dataIndex: "status",
     render: (status: string) => (
-      <Badge color={statusColor[status] ?? "light"}>{status}</Badge>
+      <Badge color={statusColor[status] ?? "light"}>
+        {status?.toLowerCase()}
+      </Badge>
     ),
   },
   {

@@ -10,10 +10,11 @@ function formatPrice(price: number): string {
   return `৳ ${(price / 100).toLocaleString()}`;
 }
 
-const statusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  success: "success",
-  failed: "error",
+const statusColor: Record<string, "warning" | "success" | "error" | "light"> = {
+  PENDING: "warning",
+  SUCCESS: "success",
+  FAILED: "error",
+  REFUNDED: "light",
 };
 
 export default function PaymentsTable() {
@@ -31,23 +32,23 @@ export default function PaymentsTable() {
     },
     {
       title: "Transaction ID",
-      dataIndex: "transactionId",
+      dataIndex: "providerTxnId",
       render: (id: string) => (
         <span
           className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-brand-500"
           onClick={() => navigator.clipboard.writeText(id)}
           title="Click to copy"
         >
-          {id.length > 20 ? `${id.slice(0, 20)}...` : id}
+          {id ? (id.length > 20 ? `${id.slice(0, 20)}...` : id) : "—"}
         </span>
       ),
     },
     {
       title: "Order ID",
-      dataIndex: ["order", "shortId"],
-      render: (shortId: string) => (
-        <span className="text-sm font-medium text-gray-800 dark:text-white/90">
-          #{shortId}
+      dataIndex: "orderId",
+      render: (orderId: string) => (
+        <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+          #{orderId?.slice(0, 8)}...
         </span>
       ),
     },
@@ -55,8 +56,8 @@ export default function PaymentsTable() {
       title: "Provider",
       dataIndex: "provider",
       render: (provider: string) => (
-        <Badge color={provider === "stripe" ? "primary" : "success"}>
-          {provider}
+        <Badge color={provider === "STRIPE" ? "primary" : "success"}>
+          {provider?.toLowerCase()}
         </Badge>
       ),
     },
@@ -74,7 +75,7 @@ export default function PaymentsTable() {
       dataIndex: "status",
       render: (status: string) => (
         <Badge color={statusColor[status] ?? "light"}>
-          {status}
+          {status?.toLowerCase()}
         </Badge>
       ),
     },

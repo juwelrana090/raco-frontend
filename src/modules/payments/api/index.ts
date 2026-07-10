@@ -1,10 +1,22 @@
-import { apiClient } from '@/lib/api/apiClient';
-import type { IPayment } from '../types';
+import { apiClient } from "@/lib/api/apiClient";
+import type { IPayment, IPaymentListResponse } from "../types";
 
 export const paymentsApi = {
-  getAll: (_filters?: { search?: string; status?: string; provider?: string; page?: number; limit?: number }) => {
-    console.warn('GET /payments list endpoint not yet available in backend');
-    return Promise.resolve({ payments: [] as IPayment[], total: 0, page: 1, limit: 10, totalPages: 0 });
+  getAll: (filters?: {
+    status?: string;
+    provider?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const params = new URLSearchParams();
+    if (filters?.status) params.append("status", filters.status);
+    if (filters?.provider) params.append("provider", filters.provider);
+    if (filters?.page) params.append("page", String(filters.page));
+    if (filters?.limit) params.append("limit", String(filters.limit));
+    const q = params.toString();
+    return apiClient.get<IPaymentListResponse>(
+      `/payments/admin/all${q ? `?${q}` : ""}`,
+    );
   },
 
   getById: (id: string) => apiClient.get<IPayment>(`/payments/${id}`),
@@ -12,11 +24,6 @@ export const paymentsApi = {
   getByOrderId: (orderId: string) =>
     apiClient.get<IPayment[]>(`/payments/order/${orderId}`),
 
-  create: (orderId: string, provider: 'STRIPE' | 'BKASH') =>
-    apiClient.post<any>('/payments', { orderId, provider }),
-
-  // NOTE: There is no GET /payments list endpoint in the backend.
-  // Admin payments list will show empty until backend adds:
-  // GET /api/v1/payments?page=&limit=&status=&provider= (admin only)
-  // Workaround: show payments per-order on the order detail page.
+  create: (orderId: string, provider: "STRIPE" | "BKASH") =>
+    apiClient.post<any>("/payments", { orderId, provider }),
 };

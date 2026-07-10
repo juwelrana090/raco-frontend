@@ -9,23 +9,25 @@ import { formatPrice } from "@/shared/utils/formatPrice";
 import Badge from "@/shared/components/ui/badge/Badge";
 import BoxIcon from "@/shared/icons/BoxIcon";
 
-const statusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  success: "success",
-  failed: "error",
+const statusColor: Record<string, "warning" | "success" | "error" | "light"> = {
+  PENDING: "warning",
+  SUCCESS: "success",
+  FAILED: "error",
+  REFUNDED: "light",
 };
 
 const providerOptions = [
   { value: "", label: "All Providers" },
-  { value: "stripe", label: "Stripe" },
-  { value: "bkash", label: "bKash" },
+  { value: "STRIPE", label: "Stripe" },
+  { value: "BKASH", label: "bKash" },
 ];
 
 const statusOptions = [
   { value: "", label: "All Status" },
-  { value: "pending", label: "Pending" },
-  { value: "success", label: "Success" },
-  { value: "failed", label: "Failed" },
+  { value: "PENDING", label: "Pending" },
+  { value: "SUCCESS", label: "Success" },
+  { value: "FAILED", label: "Failed" },
+  { value: "REFUNDED", label: "Refunded" },
 ];
 
 export default function AccountPaymentsPage() {
@@ -44,8 +46,8 @@ export default function AccountPaymentsPage() {
       }),
   });
 
-  const payments: any[] = (data as any)?.items ?? [];
-  const total: number = (data as any)?.total ?? 0;
+  const payments: any[] = Array.isArray(data) ? (data as any[]) : [];
+  const total: number = payments.length;
 
   return (
     <div className="space-y-5">
@@ -138,11 +140,15 @@ export default function AccountPaymentsPage() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs text-gray-600 dark:text-gray-300">
-                          {payment.transactionId?.slice(0, 12)}...
+                          {payment.providerTxnId
+                            ? `${payment.providerTxnId.slice(0, 12)}...`
+                            : "—"}
                         </span>
                         <button
                           onClick={() =>
-                            navigator.clipboard.writeText(payment.transactionId)
+                            navigator.clipboard.writeText(
+                              payment.providerTxnId ?? "",
+                            )
                           }
                           className="text-gray-400 hover:text-brand-500"
                           title="Copy"
@@ -165,19 +171,19 @@ export default function AccountPaymentsPage() {
                     </td>
                     <td className="px-5 py-4">
                       <Link
-                        href={`/account/orders/${payment.orderId ?? payment.order?.id}`}
+                        href={`/orders/${payment.orderId}`}
                         className="font-mono text-xs text-brand-500 hover:text-brand-600"
                       >
-                        {payment.order?.shortId ?? payment.orderId?.slice(0, 8)}
+                        {payment.orderId?.slice(0, 8)}
                       </Link>
                     </td>
                     <td className="px-5 py-4">
                       <Badge
                         color={
-                          payment.provider === "stripe" ? "primary" : "success"
+                          payment.provider === "STRIPE" ? "primary" : "success"
                         }
                       >
-                        {payment.provider}
+                        {payment.provider?.toLowerCase()}
                       </Badge>
                     </td>
                     <td className="px-5 py-4 font-medium text-gray-800 dark:text-white/90">
@@ -185,7 +191,7 @@ export default function AccountPaymentsPage() {
                     </td>
                     <td className="px-5 py-4">
                       <Badge color={statusColor[payment.status] ?? "light"}>
-                        {payment.status}
+                        {payment.status?.toLowerCase()}
                       </Badge>
                     </td>
                     <td className="px-5 py-4 text-gray-500 dark:text-gray-400">

@@ -8,10 +8,10 @@ import { QueryProvider } from "@/lib/providers/QueryProvider";
 import { ThemeProvider } from "@/shared/context/ThemeContext";
 
 const navLinks = [
-  { href: "/account/dashboard", label: "Dashboard" },
-  { href: "/account/profile", label: "Profile" },
-  { href: "/account/orders", label: "My Orders" },
-  { href: "/account/payments", label: "Payments" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/profile", label: "Profile" },
+  { href: "/orders", label: "My Orders" },
+  { href: "/payments", label: "Payments" },
 ];
 
 function SideNavItem({ href, label }: { href: string; label: string }) {

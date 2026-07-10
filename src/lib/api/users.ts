@@ -1,23 +1,31 @@
-import { apiClient } from './apiClient';
-import type { IUser } from './types';
+import { apiClient } from "./apiClient";
+import type { IUser } from "./types";
+
+export interface IUsersListResponse {
+  items: IUser[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 export const userApi = {
-  list: async (params?: { page?: number; limit?: number }) => {
-    // NOTE: There is no GET /users (admin list) endpoint in the backend spec.
-    // The admin users page will be empty until backend adds this endpoint.
-    console.warn('GET /users admin list endpoint not yet available in backend');
-    return Promise.resolve({ users: [] as IUser[], total: 0, page: 1, limit: 10 });
+  list: (params?: {
+    page?: number;
+    limit?: number;
+    role?: string;
+    search?: string;
+  }) => {
+    const p = new URLSearchParams();
+    if (params?.page) p.append("page", String(params.page));
+    if (params?.limit) p.append("limit", String(params.limit));
+    if (params?.role) p.append("role", params.role);
+    if (params?.search) p.append("search", params.search);
+    const q = p.toString();
+    return apiClient.get<IUsersListResponse>(`/users${q ? `?${q}` : ""}`);
   },
 
-  getById: (id: string) => {
-    // NOTE: No GET /users/:id endpoint exists. Only /users/me.
-    console.warn('GET /users/:id endpoint not available in backend');
-    return Promise.resolve(null as unknown as IUser);
-  },
+  getById: (id: string) => apiClient.get<IUser>(`/users/${id}`),
 
-  updateRole: (id: string, role: 'USER' | 'ADMIN') => {
-    // NOTE: No PATCH /users/:id/role endpoint exists in the backend spec.
-    console.warn('PATCH /users/:id/role endpoint not available in backend');
-    return Promise.resolve(null as unknown as IUser);
-  },
+  updateRole: (_id: string, _role: "USER" | "ADMIN") =>
+    Promise.reject(new Error("Role update endpoint not yet available")),
 };

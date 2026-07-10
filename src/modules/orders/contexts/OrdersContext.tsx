@@ -1,5 +1,11 @@
 "use client";
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { useFetchOrders } from "../hooks/useFetchOrders";
 import type { IOrder, IOrderFilters } from "../types";
 
@@ -10,7 +16,6 @@ interface OrdersContextValue {
   totalPages: number;
   isLoading: boolean;
   filters: IOrderFilters;
-  setSearch: (search: string) => void;
   setStatus: (status: string) => void;
   setPage: (page: number) => void;
 }
@@ -25,10 +30,6 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
 
   const { data, isLoading } = useFetchOrders(filters);
 
-  const setSearch = useCallback((search: string) => {
-    setFilters((prev) => ({ ...prev, search, page: 1 }));
-  }, []);
-
   const setStatus = useCallback((status: string) => {
     setFilters((prev) => ({ ...prev, status, page: 1 }));
   }, []);
@@ -40,13 +41,14 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
   return (
     <OrdersContext.Provider
       value={{
-        orders: data?.orders ?? [],
+        orders: data?.items ?? [],
         total: data?.total ?? 0,
         page: data?.page ?? 1,
-        totalPages: data?.totalPages ?? 0,
+        totalPages: data
+          ? Math.ceil((data.total ?? 0) / (data.limit || 10))
+          : 0,
         isLoading,
         filters,
-        setSearch,
         setStatus,
         setPage,
       }}

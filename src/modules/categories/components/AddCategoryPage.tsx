@@ -1,11 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useCategories } from "@/modules/categories/hooks/useCategories";
 import AddCategoryForm from "./AddCategoryForm";
 
 export default function AddCategoryPage() {
   const router = useRouter();
-
-  const categories: Array<{ id: string; name: string; children?: Array<{ id: string; name: string }> }> = [];
+  const { data: categoriesData, isLoading } = useCategories({ limit: 100 });
+  const categories = (categoriesData ?? []) as Array<{
+    id: string;
+    name: string;
+    children?: Array<{ id: string; name: string }>;
+  }>;
 
   return (
     <div className="space-y-5">
@@ -37,7 +42,13 @@ export default function AddCategoryPage() {
           </p>
         </div>
       </div>
-      <AddCategoryForm categories={categories} />
+      {isLoading ? (
+        <div className="flex h-32 items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+        </div>
+      ) : (
+        <AddCategoryForm categories={categories} />
+      )}
     </div>
   );
 }

@@ -9,9 +9,9 @@ function formatPrice(price: number): string {
 }
 
 const statusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  paid: "success",
-  canceled: "error",
+  PENDING: "warning",
+  PAID: "success",
+  CANCELED: "error",
 };
 
 export default function OrderDetailPage() {
@@ -39,7 +39,7 @@ export default function OrderDetailPage() {
     <div className="space-y-5">
       <div>
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-          Order #{order.shortId}
+          Order #{order.id?.slice(0, 8)}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Order details and status
@@ -49,13 +49,10 @@ export default function OrderDetailPage() {
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
           <h3 className="mb-3 text-sm font-medium text-gray-500 dark:text-gray-400">
-            Customer
+            User
           </h3>
           <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-            {order.customer.name}
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {order.customer.email}
+            {order.userId}
           </p>
         </div>
 
@@ -65,10 +62,7 @@ export default function OrderDetailPage() {
           </h3>
           <div className="flex items-center gap-2">
             <Badge color={statusColor[order.status] ?? "light"}>
-              {order.status}
-            </Badge>
-            <Badge color={order.paymentProvider === "stripe" ? "primary" : "success"}>
-              {order.paymentProvider}
+              {order.status?.toLowerCase()}
             </Badge>
           </div>
         </div>
@@ -88,21 +82,21 @@ export default function OrderDetailPage() {
           Order Items
         </h3>
         <div className="space-y-3">
-          {order.items.map((item) => (
+          {(order.items ?? []).map((item) => (
             <div
               key={item.id}
               className="flex items-center justify-between rounded-lg border border-gray-100 p-3 dark:border-gray-800"
             >
               <div>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {item.product.name}
+                  {item.productId}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Qty: {item.quantity}
                 </p>
               </div>
               <span className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {formatPrice(item.price * item.quantity)}
+                {formatPrice(item.subtotal ?? item.price * item.quantity)}
               </span>
             </div>
           ))}
@@ -112,7 +106,7 @@ export default function OrderDetailPage() {
             Total
           </span>
           <span className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            {formatPrice(order.total)}
+            {formatPrice(order.totalAmount ?? 0)}
           </span>
         </div>
       </div>

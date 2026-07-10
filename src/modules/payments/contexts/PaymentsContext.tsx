@@ -1,5 +1,11 @@
 "use client";
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { useFetchPayments } from "../hooks/useFetchPayments";
 import type { IPayment, IPaymentFilters } from "../types";
 
@@ -10,7 +16,6 @@ interface PaymentsContextValue {
   totalPages: number;
   isLoading: boolean;
   filters: IPaymentFilters;
-  setSearch: (search: string) => void;
   setStatus: (status: string) => void;
   setProvider: (provider: string) => void;
   setPage: (page: number) => void;
@@ -25,10 +30,6 @@ export function PaymentsProvider({ children }: { children: ReactNode }) {
   });
 
   const { data, isLoading } = useFetchPayments(filters);
-
-  const setSearch = useCallback((search: string) => {
-    setFilters((prev) => ({ ...prev, search, page: 1 }));
-  }, []);
 
   const setStatus = useCallback((status: string) => {
     setFilters((prev) => ({ ...prev, status, page: 1 }));
@@ -45,13 +46,14 @@ export function PaymentsProvider({ children }: { children: ReactNode }) {
   return (
     <PaymentsContext.Provider
       value={{
-        payments: data?.payments ?? [],
+        payments: data?.items ?? [],
         total: data?.total ?? 0,
         page: data?.page ?? 1,
-        totalPages: data?.totalPages ?? 0,
+        totalPages: data
+          ? Math.ceil((data.total ?? 0) / (data.limit || 10))
+          : 0,
         isLoading,
         filters,
-        setSearch,
         setStatus,
         setProvider,
         setPage,

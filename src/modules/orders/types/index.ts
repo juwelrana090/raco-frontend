@@ -1,37 +1,31 @@
 export interface IOrder {
   id: string;
-  shortId: string;
-  customer: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  items: Array<{
-    id: string;
-    product: {
-      name: string;
-      price: number;
-    };
-    quantity: number;
-    price: number;
-  }>;
-  total: number;
-  status: 'pending' | 'paid' | 'canceled';
-  paymentProvider: 'stripe' | 'bkash';
+  userId: string;
+  totalAmount: number;
+  status: "PENDING" | "PAID" | "CANCELED";
+  items?: IOrderItem[];
   createdAt: string;
   updatedAt: string;
 }
 
+export interface IOrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+  createdAt: string;
+}
+
 export interface IOrderListResponse {
-  orders: IOrder[];
+  items: IOrder[];
   total: number;
   page: number;
   limit: number;
-  totalPages: number;
 }
 
 export interface IOrderFilters {
-  search?: string;
   status?: string;
   page?: number;
   limit?: number;

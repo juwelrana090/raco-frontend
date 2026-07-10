@@ -1,4 +1,4 @@
-import { apiClient } from './apiClient';
+import { apiClient } from "./apiClient";
 
 export interface IProduct {
   id: string;
@@ -19,9 +19,12 @@ export interface IProduct {
 
 export interface IProductListResponse {
   products: IProduct[];
-  total: number;
-  page: number;
-  limit: number;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface IProductFilters {
@@ -32,13 +35,13 @@ export interface IProductFilters {
 }
 
 function buildQuery(filters?: Record<string, any>): string {
-  if (!filters) return '';
+  if (!filters) return "";
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([k, v]) => {
-    if (v !== undefined && v !== '' && v !== null) params.append(k, String(v));
+    if (v !== undefined && v !== "" && v !== null) params.append(k, String(v));
   });
   const q = params.toString();
-  return q ? `?${q}` : '';
+  return q ? `?${q}` : "";
 }
 
 export const productApi = {
@@ -50,7 +53,9 @@ export const productApi = {
 
   // GET /products/:id/recommendations
   getRecommendations: (id: string, limit?: number) =>
-    apiClient.get<any>(`/products/${id}/recommendations${limit ? `?limit=${limit}` : ''}`),
+    apiClient.get<any>(
+      `/products/${id}/recommendations${limit ? `?limit=${limit}` : ""}`,
+    ),
 
   // POST /products — Admin only
   // Fields: sku*, name*, description, price*, stock*, imageUrl, categoryId*
@@ -63,38 +68,49 @@ export const productApi = {
     stock: number;
     imageUrl?: string;
     categoryId: string;
-  }) => apiClient.post<IProduct>('/products', data),
+  }) => apiClient.post<IProduct>("/products", data),
 
   // PATCH /products/:id — Admin only
-  update: (id: string, data: {
-    sku?: string;
-    name?: string;
-    description?: string;
-    price?: number;
-    stock?: number;
-    imageUrl?: string;
-    categoryId?: string;
-  }) => apiClient.patch<IProduct>(`/products/${id}`, data),
+  update: (
+    id: string,
+    data: {
+      sku?: string;
+      name?: string;
+      description?: string;
+      price?: number;
+      stock?: number;
+      imageUrl?: string;
+      categoryId?: string;
+    },
+  ) => apiClient.patch<IProduct>(`/products/${id}`, data),
 
   // DELETE /products/:id — Admin only
   delete: (id: string) => apiClient.delete<void>(`/products/${id}`),
 
   // POST /products/:id/image — multipart/form-data, Admin only
   // Must use raw fetch — apiClient forces application/json Content-Type
-  uploadImage: async (id: string, file: File): Promise<{ imageUrl: string }> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
-    const token = typeof document !== 'undefined'
-      ? document.cookie.split('; ').find(r => r.startsWith('raco_token='))?.split('=')[1]
-      : '';
+  uploadImage: async (
+    id: string,
+    file: File,
+  ): Promise<{ imageUrl: string }> => {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
+    const token =
+      typeof document !== "undefined"
+        ? document.cookie
+            .split("; ")
+            .find((r) => r.startsWith("raco_token="))
+            ?.split("=")[1]
+        : "";
     const form = new FormData();
-    form.append('image', file);
+    form.append("image", file);
     const res = await fetch(`${baseUrl}/products/${id}/image`, {
-      method: 'POST',
+      method: "POST",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: form,
     });
     const json = await res.json();
-    if (!json.success) throw new Error(json.message ?? 'Upload failed');
+    if (!json.success) throw new Error(json.message ?? "Upload failed");
     return json.data;
   },
 

@@ -31,8 +31,8 @@ function ShopContent() {
     queryFn: () => storefrontApi.getCategories(),
   });
 
-  const products: any[] = (productsData as any)?.items ?? [];
-  const total: number = (productsData as any)?.total ?? 0;
+  const products: any[] = (productsData as any)?.products ?? [];
+  const total: number = (productsData as any)?.pagination?.total ?? 0;
   const categories: any[] = Array.isArray(categoriesData)
     ? (categoriesData as any[])
     : [];
@@ -70,30 +70,51 @@ function ShopContent() {
               type="text"
               placeholder="Search products..."
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
               className="w-full h-10 pl-9 pr-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-800 dark:text-white/90 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
             />
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"
+              />
             </svg>
           </div>
 
           {/* Category select */}
           <select
             value={category}
-            onChange={(e) => { setCategory(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setPage(1);
+            }}
             className="h-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 text-sm text-gray-700 dark:text-white/90 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           >
             <option value="">All Categories</option>
             {categories.map((cat: any) => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
             ))}
           </select>
         </div>
 
         {/* Results count */}
         <p className="text-sm text-gray-500 dark:text-gray-400 shrink-0">
-          <span className="font-semibold text-gray-800 dark:text-white/90">{total}</span> products found
+          <span className="font-semibold text-gray-800 dark:text-white/90">
+            {total}
+          </span>{" "}
+          products found
         </p>
       </div>
 

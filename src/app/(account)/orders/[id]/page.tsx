@@ -8,15 +8,15 @@ import { formatPrice } from "@/shared/utils/formatPrice";
 import Badge from "@/shared/components/ui/badge/Badge";
 
 const statusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  paid: "success",
-  canceled: "error",
+  PENDING: "warning",
+  PAID: "success",
+  CANCELED: "error",
 };
 
 const paymentStatusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  success: "success",
-  failed: "error",
+  PENDING: "warning",
+  SUCCESS: "success",
+  FAILED: "error",
 };
 
 export default function AccountOrderDetailPage() {
@@ -56,7 +56,7 @@ export default function AccountOrderDetailPage() {
   return (
     <div className="space-y-5">
       <Link
-        href="/account/orders"
+        href="/orders"
         className="text-sm text-brand-500 hover:text-brand-600"
       >
         ← Back to Orders
@@ -126,7 +126,7 @@ export default function AccountOrderDetailPage() {
                     {formatPrice(item.price)}
                   </td>
                   <td className="py-3 text-right font-medium text-gray-800 dark:text-white/90">
-                    {formatPrice(item.price * item.quantity)}
+                    {formatPrice(item.subtotal ?? item.price * item.quantity)}
                   </td>
                 </tr>
               ))}
@@ -140,7 +140,7 @@ export default function AccountOrderDetailPage() {
                   Total
                 </td>
                 <td className="pt-3 text-right text-lg font-bold text-gray-800 dark:text-white/90">
-                  {formatPrice(o.total)}
+                  {formatPrice(o.totalAmount ?? 0)}
                 </td>
               </tr>
             </tfoot>
@@ -161,9 +161,9 @@ export default function AccountOrderDetailPage() {
               </p>
               <div className="mt-1">
                 <Badge
-                  color={payment.provider === "stripe" ? "primary" : "success"}
+                  color={payment.provider === "STRIPE" ? "primary" : "success"}
                 >
-                  {payment.provider}
+                  {payment.provider?.toLowerCase()}
                 </Badge>
               </div>
             </div>
@@ -173,11 +173,13 @@ export default function AccountOrderDetailPage() {
               </p>
               <div className="mt-1 flex items-center gap-2">
                 <span className="font-mono text-xs text-gray-800 dark:text-white/90">
-                  {payment.transactionId?.slice(0, 20)}...
+                  {payment.providerTxnId
+                    ? `${payment.providerTxnId.slice(0, 20)}...`
+                    : "—"}
                 </span>
                 <button
                   onClick={() =>
-                    navigator.clipboard.writeText(payment.transactionId)
+                    navigator.clipboard.writeText(payment.providerTxnId ?? "")
                   }
                   className="text-xs text-brand-500 hover:text-brand-600"
                   title="Copy transaction ID"
@@ -190,7 +192,7 @@ export default function AccountOrderDetailPage() {
               <p className="text-xs text-gray-500 dark:text-gray-400">Status</p>
               <div className="mt-1">
                 <Badge color={paymentStatusColor[payment.status] ?? "light"}>
-                  {payment.status}
+                  {payment.status?.toLowerCase()}
                 </Badge>
               </div>
             </div>

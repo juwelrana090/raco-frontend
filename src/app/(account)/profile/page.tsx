@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 import { accountApi } from "@/lib/api/account";
 import { useAuthStore } from "@/lib/auth/authStore";
 import Badge from "@/shared/components/ui/badge/Badge";
@@ -38,6 +39,10 @@ export default function ProfilePage() {
     onSubmit: async (values) => {
       try {
         await accountApi.updateMe({ name: values.name });
+        if (user && token) {
+          const refreshToken = Cookies.get("raco_refresh") ?? "";
+          setAuth({ ...user, name: values.name }, token, refreshToken);
+        }
         toast.success("Profile updated");
       } catch (err: any) {
         toast.error(err?.message ?? "Failed to update profile");

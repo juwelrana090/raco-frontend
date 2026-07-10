@@ -1,13 +1,14 @@
-import { apiClient } from './apiClient';
+import { apiClient } from "./apiClient";
 
 export interface IPayment {
   id: string;
   orderId: string;
-  userId: string;
   amount: number; // in poisha
-  provider: 'STRIPE' | 'BKASH';
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
-  transactionId?: string;
+  provider: "STRIPE" | "BKASH";
+  status: "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED";
+  providerTxnId?: string | null;
+  clientSecret?: string | null;
+  bkashURL?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,8 +22,8 @@ export const paymentsApi = {
     apiClient.get<IPayment[]>(`/payments/order/${orderId}`),
 
   // POST /payments — create payment (called by checkout flow)
-  create: (orderId: string, provider: 'STRIPE' | 'BKASH') =>
-    apiClient.post<any>('/payments', { orderId, provider }),
+  create: (orderId: string, provider: "STRIPE" | "BKASH") =>
+    apiClient.post<any>("/payments", { orderId, provider }),
 
   // NOTE: There is no GET /payments list endpoint in the backend.
   // Admin payments list will show empty until backend adds:

@@ -1,11 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
 import EditCategoryForm from "@/modules/categories/components/EditCategoryForm";
+import { useCategories } from "@/modules/categories/hooks/useCategories";
 
 export default function AdminEditCategoryPage() {
   const router = useRouter();
-
-  const categories: Array<{ id: string; name: string; children?: Array<{ id: string; name: string }> }> = [];
+  const { data: categoriesData, isLoading } = useCategories({ limit: 100 });
+  const categories = (categoriesData ?? []) as Array<{
+    id: string;
+    name: string;
+    children?: Array<{ id: string; name: string }>;
+  }>;
 
   return (
     <div className="space-y-5">
@@ -37,7 +42,13 @@ export default function AdminEditCategoryPage() {
           </p>
         </div>
       </div>
-      <EditCategoryForm categories={categories} />
+      {isLoading ? (
+        <div className="flex h-32 items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+        </div>
+      ) : (
+        <EditCategoryForm categories={categories} />
+      )}
     </div>
   );
 }

@@ -1,30 +1,40 @@
-'use client';
-import { useAuthStore } from './authStore';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+"use client";
+import { useAuthStore } from "./authStore";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AuthGuard({
   children,
   requiredRole,
 }: {
   children: React.ReactNode;
-  requiredRole?: 'ADMIN' | 'USER';
+  requiredRole?: "ADMIN" | "USER";
 }) {
   const { isAuthenticated, user } = useAuthStore();
   const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
     if (!isAuthenticated) {
-      router.replace('/auth/login');
+      router.replace("/auth/login");
       return;
     }
-    if (requiredRole === 'ADMIN' && user?.role !== 'ADMIN') {
-      router.replace('/');
-    }
-  }, [isAuthenticated, user, requiredRole, router]);
 
+    if (requiredRole === "ADMIN" && user !== null && user.role !== "ADMIN") {
+      router.replace("/");
+    }
+  }, [hydrated, isAuthenticated, user, requiredRole, router]);
+
+  if (!hydrated) return null;
   if (!isAuthenticated) return null;
-  if (requiredRole === 'ADMIN' && user?.role !== 'ADMIN') return null;
+  if (requiredRole === "ADMIN" && user !== null && user.role !== "ADMIN")
+    return null;
 
   return <>{children}</>;
 }

@@ -41,7 +41,7 @@ export default function CheckoutSuccessPage() {
       )}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link
-          href="/account/orders"
+          href="/orders"
           className="rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-600"
         >
           View My Orders

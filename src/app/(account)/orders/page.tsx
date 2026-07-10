@@ -10,16 +10,16 @@ import Badge from "@/shared/components/ui/badge/Badge";
 import BoxIcon from "@/shared/icons/BoxIcon";
 
 const statusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  paid: "success",
-  canceled: "error",
+  PENDING: "warning",
+  PAID: "success",
+  CANCELED: "error",
 };
 
 const statusOptions = [
   { value: "", label: "All Status" },
-  { value: "pending", label: "Pending" },
-  { value: "paid", label: "Paid" },
-  { value: "canceled", label: "Canceled" },
+  { value: "PENDING", label: "Pending" },
+  { value: "PAID", label: "Paid" },
+  { value: "CANCELED", label: "Canceled" },
 ];
 
 export default function AccountOrdersPage() {
@@ -36,8 +36,8 @@ export default function AccountOrdersPage() {
       }),
   });
 
-  const orders: any[] = (data as any)?.items ?? [];
-  const total: number = (data as any)?.total ?? 0;
+  const orders: any[] = Array.isArray(data) ? (data as any[]) : [];
+  const total: number = orders.length;
 
   return (
     <div className="space-y-5">
@@ -108,17 +108,17 @@ export default function AccountOrdersPage() {
                 {orders.map((order) => (
                   <tr key={order.id}>
                     <td className="px-5 py-4 font-mono text-xs text-gray-500 dark:text-gray-400">
-                      {order.shortId ?? order.id?.slice(0, 8)}...
+                      {order.id?.slice(0, 8)}...
                     </td>
                     <td className="px-5 py-4 text-gray-600 dark:text-gray-300">
                       {order.items?.length ?? 0}
                     </td>
                     <td className="px-5 py-4 font-medium text-gray-800 dark:text-white/90">
-                      {formatPrice(order.total)}
+                      {formatPrice(order.totalAmount ?? 0)}
                     </td>
                     <td className="px-5 py-4">
                       <Badge color={statusColor[order.status] ?? "light"}>
-                        {order.status}
+                        {order.status?.toLowerCase()}
                       </Badge>
                     </td>
                     <td className="px-5 py-4 text-gray-500 dark:text-gray-400">
@@ -126,7 +126,7 @@ export default function AccountOrdersPage() {
                     </td>
                     <td className="px-5 py-4">
                       <Link
-                        href={`/account/orders/${order.id}`}
+                        href={`/orders/${order.id}`}
                         className="text-brand-500 hover:text-brand-600"
                       >
                         View

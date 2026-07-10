@@ -35,7 +35,7 @@ export default function CheckoutFailedPage() {
           Try Again
         </Link>
         <Link
-          href="/account/orders"
+          href="/orders"
           className="rounded-lg border border-gray-300 dark:border-gray-700 px-6 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           View Orders

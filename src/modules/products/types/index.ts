@@ -2,32 +2,37 @@ export interface IProduct {
   id: string;
   name: string;
   sku: string;
-  description?: string;
+  description?: string | null;
   price: number;
   stock: number;
-  status: 'active' | 'inactive';
-  imageUrl?: string;
-  category: {
+  imageUrl?: string | null;
+  fileManagerId?: number | null;
+  categoryId: string;
+  category?: {
     id: string;
     name: string;
-  };
-  categoryId: string;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface IProductListResponse {
-  products: IProduct[];
-  total: number;
+export interface IProductPagination {
   page: number;
   limit: number;
+  total: number;
   totalPages: number;
+}
+
+export interface IProductListResponse {
+  products: IProduct[];
+  pagination: IProductPagination;
 }
 
 export interface IProductFilters {
   search?: string;
-  status?: string;
   categoryId?: string;
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }

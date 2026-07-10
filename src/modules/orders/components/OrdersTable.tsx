@@ -1,5 +1,6 @@
 "use client";
 import { Table } from "antd";
+import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { useOrders } from "../contexts/OrdersContext";
 import Badge from "@/shared/components/ui/badge/Badge";
@@ -11,13 +12,14 @@ function formatPrice(price: number): string {
 }
 
 const statusColor: Record<string, "warning" | "success" | "error"> = {
-  pending: "warning",
-  paid: "success",
-  canceled: "error",
+  PENDING: "warning",
+  PAID: "success",
+  CANCELED: "error",
 };
 
 export default function OrdersTable() {
   const { orders, total, isLoading, page, setPage } = useOrders();
+  const router = useRouter();
 
   const columns: ColumnsType<IOrder> = [
     {
@@ -31,28 +33,28 @@ export default function OrdersTable() {
     },
     {
       title: "Order ID",
-      dataIndex: "shortId",
-      render: (shortId: string) => (
-        <span className="text-sm font-medium text-gray-800 dark:text-white/90">
-          #{shortId}
+      dataIndex: "id",
+      render: (id: string) => (
+        <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
+          #{id?.slice(0, 8)}...
         </span>
       ),
     },
     {
-      title: "Customer",
-      dataIndex: ["customer", "name"],
-      render: (name: string) => (
-        <span className="text-sm text-gray-600 dark:text-gray-300">
-          {name}
+      title: "User ID",
+      dataIndex: "userId",
+      render: (userId: string) => (
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          {userId?.slice(0, 8)}...
         </span>
       ),
     },
     {
       title: "Total",
-      dataIndex: "total",
-      render: (total: number) => (
+      dataIndex: "totalAmount",
+      render: (totalAmount: number) => (
         <span className="text-sm font-medium text-gray-800 dark:text-white/90">
-          {formatPrice(total)}
+          {formatPrice(totalAmount ?? 0)}
         </span>
       ),
     },
@@ -61,7 +63,7 @@ export default function OrdersTable() {
       dataIndex: "items",
       render: (items: IOrder["items"]) => (
         <span className="text-sm text-gray-600 dark:text-gray-300">
-          {items.length}
+          {items?.length ?? 0}
         </span>
       ),
     },
@@ -70,16 +72,7 @@ export default function OrdersTable() {
       dataIndex: "status",
       render: (status: string) => (
         <Badge color={statusColor[status] ?? "light"}>
-          {status}
-        </Badge>
-      ),
-    },
-    {
-      title: "Payment",
-      dataIndex: "paymentProvider",
-      render: (provider: string) => (
-        <Badge color={provider === "stripe" ? "primary" : "success"}>
-          {provider}
+          {status?.toLowerCase()}
         </Badge>
       ),
     },
@@ -97,7 +90,7 @@ export default function OrdersTable() {
       width: 80,
       render: (_: unknown, record: IOrder) => (
         <button
-          onClick={() => window.location.href = `/admin/orders/${record.id}`}
+          onClick={() => router.push(`/admin/orders/${record.id}`)}
           className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5"
         >
           <svg
@@ -138,7 +131,7 @@ export default function OrdersTable() {
           showTotal: (total, range) =>
             `Showing ${range[0]}-${range[1]} of ${total} orders`,
         }}
-        scroll={{ x: 900 }}
+        scroll={{ x: 700 }}
       />
     </div>
   );

@@ -1,10 +1,10 @@
 export interface IUser {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
-  role: 'USER' | 'ADMIN';
+  role: "USER" | "ADMIN";
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
 }
 
 export interface IAuthResponse {
@@ -22,4 +22,8 @@ export interface IRegisterRequest {
   name: string;
   email: string;
   password: string;
+}
+
+export interface IValidateResponse {
+  user: IUser;
 }
