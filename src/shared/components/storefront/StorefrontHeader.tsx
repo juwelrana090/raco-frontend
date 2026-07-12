@@ -11,6 +11,8 @@ export default function StorefrontHeader() {
   const { isAuthenticated, user, clearAuth } = useAuthStore();
   const totalItems = useCartStore((s) => s.totalItems());
   const [search, setSearch] = useState("");
+  const isAdmin = user?.role === "ADMIN";
+  const accountHref = isAdmin ? "/admin/dashboard" : "/dashboard";
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
 
@@ -109,7 +111,7 @@ export default function StorefrontHeader() {
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <Link
-                  href="/dashboard"
+                  href={accountHref}
                   className="hidden sm:flex h-10 items-center gap-2 rounded-xl px-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-brand-600 text-xs font-semibold dark:bg-brand-500/20 dark:text-brand-400">
@@ -228,11 +230,11 @@ export default function StorefrontHeader() {
             ))}
             {isAuthenticated && (
               <Link
-                href="/dashboard"
+                href={accountHref}
                 onClick={() => setMobileOpen(false)}
                 className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                My Account
+                {isAdmin ? "Admin Dashboard" : "My Account"}
               </Link>
             )}
           </div>

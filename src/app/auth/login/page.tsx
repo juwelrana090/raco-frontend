@@ -31,7 +31,7 @@ export default function LoginPage() {
           initialValues={{ email: '', password: '' }}
           validationSchema={Yup.object({
             email: Yup.string().email('Invalid email').required('Email is required'),
-            password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+            password: Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
           })}
           onSubmit={async (values, { setSubmitting }) => {
             try {
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Password
                 </label>
-                <Field name="password" type="password" className={inputClass} placeholder="Min 6 characters" />
+                <Field name="password" type="password" className={inputClass} placeholder="Min 8 characters" />
                 {errors.password && touched.password && (
                   <p className="mt-1 text-xs text-error-500">{errors.password}</p>
                 )}

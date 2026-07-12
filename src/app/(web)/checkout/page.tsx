@@ -8,7 +8,7 @@ import { useCartStore } from "@/lib/store/cartStore";
 import { apiClient } from "@/lib/api/apiClient";
 import { formatPrice } from "@/shared/utils/formatPrice";
 
-type Provider = "stripe" | "bkash";
+type Provider = "STRIPE" | "BKASH";
 
 interface IOrderResponse {
   id: string;
@@ -32,7 +32,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
   const { items, totalAmount, clearCart } = useCartStore();
-  const [provider, setProvider] = useState<Provider>("stripe");
+  const [provider, setProvider] = useState<Provider>("STRIPE");
   const [loading, setLoading] = useState(false);
 
   if (!isAuthenticated) {
@@ -77,7 +77,7 @@ export default function CheckoutPage() {
 
       clearCart();
 
-      if (provider === "stripe") {
+      if (provider === "STRIPE") {
         const secret =
           checkout.clientSecret ??
           checkout.data?.clientSecret;
@@ -154,8 +154,8 @@ export default function CheckoutPage() {
 
           {/* Stripe */}
           <div
-            className={provider === "stripe" ? cardSelected : cardUnselected}
-            onClick={() => setProvider("stripe")}
+            className={provider === "STRIPE" ? cardSelected : cardUnselected}
+            onClick={() => setProvider("STRIPE")}
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-500/10">
@@ -186,8 +186,8 @@ export default function CheckoutPage() {
 
           {/* bKash */}
           <div
-            className={provider === "bkash" ? cardSelected : cardUnselected}
-            onClick={() => setProvider("bkash")}
+            className={provider === "BKASH" ? cardSelected : cardUnselected}
+            onClick={() => setProvider("BKASH")}
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-pink-50 dark:bg-pink-500/10">

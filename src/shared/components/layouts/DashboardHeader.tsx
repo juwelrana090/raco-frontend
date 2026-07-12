@@ -9,12 +9,30 @@ import MoonIcon from '@/shared/icons/MoonIcon';
 import BellIcon from '@/shared/icons/BellIcon';
 import UserIcon from '@/shared/icons/UserIcon';
 import { Dropdown, Button, Input } from 'antd';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/lib/auth/authStore';
+import { authApi } from '@/lib/api/auth';
+import Cookies from 'js-cookie';
 
 const { Search } = Input;
 
 export default function DashboardHeader() {
   const { isMobileOpen, toggleMobileSidebar, isExpanded } = useSidebar();
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
+  const { clearAuth } = useAuthStore();
+
+  const handleLogout = async () => {
+    try {
+      const refreshToken = Cookies.get('raco_refresh') ?? '';
+      if (refreshToken) {
+        await authApi.logout(refreshToken).catch(() => {});
+      }
+    } finally {
+      clearAuth();
+      router.push('/auth/login');
+    }
+  };
 
   const notificationItems = [
     {
@@ -36,19 +54,17 @@ export default function DashboardHeader() {
 
   const userItems = [
     {
-      key: '1',
+      key: 'profile',
       label: <div className="px-2 py-1">Profile</div>,
-    },
-    {
-      key: '2',
-      label: <div className="px-2 py-1">Settings</div>,
+      onClick: () => router.push('/admin/profile'),
     },
     {
       type: 'divider' as const,
     },
     {
-      key: '3',
+      key: 'logout',
       label: <div className="px-2 py-1 text-error-500">Logout</div>,
+      onClick: handleLogout,
     },
   ];
 
