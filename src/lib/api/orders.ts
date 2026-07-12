@@ -29,6 +29,11 @@ export interface IOrderListResponse {
   limit: number;
 }
 
+export interface ICheckoutResponse {
+  redirectUrl: string;
+  provider: "STRIPE" | "BKASH";
+}
+
 export const orderApi = {
   // GET /orders/admin/all — admin list
   getAll: (filters?: { status?: string; page?: number; limit?: number }) => {
@@ -51,12 +56,12 @@ export const orderApi = {
 
   // POST /orders/:id/checkout — initiate payment
   checkout: (id: string, provider: "STRIPE" | "BKASH") =>
-    apiClient.post<any>(`/orders/${id}/checkout`, { provider }),
+    apiClient.post<ICheckoutResponse>(`/orders/${id}/checkout`, { provider }),
 
   // DELETE /orders/:id — cancel order (PENDING only)
   cancel: (id: string) => apiClient.delete<IOrder>(`/orders/${id}`),
 
   // There is currently no backend endpoint for manual admin status updates.
-  updateStatus: (_id: string, _status: OrderStatus) =>
+  updateStatus: (id: string, status: OrderStatus) =>
     Promise.reject(new Error("Order status update endpoint not yet available")),
 };

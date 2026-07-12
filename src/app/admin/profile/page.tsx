@@ -18,7 +18,7 @@ export default function AdminProfilePage() {
     queryFn: () => accountApi.getMe(),
   });
 
-  const me = (meData as any) ?? user;
+  const me = meData ?? user;
 
   const form = useFormik({
     enableReinitialize: true,
@@ -34,8 +34,9 @@ export default function AdminProfilePage() {
           setAuth({ ...user, name: values.name }, token, refreshToken);
         }
         toast.success("Profile updated");
-      } catch (err: any) {
-        toast.error(err?.message ?? "Failed to update profile");
+      } catch (err) {
+        const error = err as Error;
+        toast.error(error.message ?? "Failed to update profile");
       }
     },
   });

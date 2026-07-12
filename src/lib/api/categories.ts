@@ -21,6 +21,14 @@ export interface ICategoryListResponse {
   limit: number;
 }
 
+export interface ICategoryProduct {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string | null;
+  categoryId: string;
+}
+
 export interface ICreateCategoryRequest {
   name: string;
   description?: string;
@@ -44,7 +52,7 @@ export const categoryApi = {
 
   // GET /categories/:id/products
   getCategoryProducts: (id: string) =>
-    apiClient.get<any>(`/categories/${id}/products`),
+    apiClient.get<ICategoryProduct[]>(`/categories/${id}/products`),
 
   create: (data: ICreateCategoryRequest) =>
     apiClient.post<ICategory>('/categories', data),

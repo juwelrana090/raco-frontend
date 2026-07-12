@@ -4,6 +4,36 @@ import { useQuery } from "@tanstack/react-query";
 import { storefrontApi } from "@/lib/api/storefront";
 import ProductCard from "@/shared/components/storefront/ProductCard";
 
+interface IProduct {
+  id: string;
+  name: string;
+  sku?: string | undefined;
+  description: string | null;
+  price: number;
+  stock: number;
+  imageUrl: string | null;
+  categoryId: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+}
+
+interface IProductsResponse {
+  products: IProduct[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+}
+
+interface ICategory {
+  id: string;
+  name: string;
+  parentId: string | null;
+}
+
 const CATEGORY_ICONS: Record<string, string> = {
   default: "📦",
   electronics: "💻",
@@ -29,7 +59,7 @@ export default function HomePage() {
   const { data: productsData, isLoading: productsLoading } = useQuery({
     queryKey: ["storefront-featured"],
     queryFn: () =>
-      storefrontApi.getProducts({ limit: 8, status: "ACTIVE" } as any),
+      storefrontApi.getProducts({ limit: 8, status: "ACTIVE" }),
   });
 
   const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
@@ -37,9 +67,9 @@ export default function HomePage() {
     queryFn: () => storefrontApi.getCategories(),
   });
 
-  const products: any[] = (productsData as any)?.products ?? [];
-  const categories: any[] = Array.isArray(categoriesData)
-    ? (categoriesData as any[]).filter((c: any) => !c.parentId)
+  const products = (productsData as IProductsResponse | undefined)?.products ?? [];
+  const categories = Array.isArray(categoriesData)
+    ? (categoriesData as ICategory[]).filter((c) => !c.parentId)
     : [];
 
   return (
@@ -210,7 +240,7 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {categories.slice(0, 6).map((cat: any, i: number) => {
+              {categories.slice(0, 6).map((cat, i) => {
                 const colors = [
                   "from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-100 dark:border-blue-800/30",
                   "from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-100 dark:border-purple-800/30",

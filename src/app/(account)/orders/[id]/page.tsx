@@ -2,10 +2,53 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import Image from "next/image";
 import dayjs from "dayjs";
 import { accountApi } from "@/lib/api/account";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import Badge from "@/shared/components/ui/badge/Badge";
+
+interface IOrderProduct {
+  id: string;
+  name: string;
+  imageUrl: string | null;
+  price: number;
+}
+
+interface IOrderItem {
+  id: string;
+  product: IOrderProduct;
+  quantity: number;
+  price: number;
+  subtotal: number;
+}
+
+interface IOrderDetail {
+  id: string;
+  orderNumber: string;
+  status: string;
+  totalAmount: number;
+  total: number;
+  createdAt: string;
+  updatedAt: string;
+  items: IOrderItem[];
+  payment?: {
+    id: string;
+    amount: number;
+    status: string;
+    method: string;
+    provider?: string;
+    providerTxnId?: string;
+  };
+  payments?: Array<{
+    id: string;
+    amount: number;
+    status: string;
+    method: string;
+    provider?: string;
+    providerTxnId?: string;
+  }>;
+}
 
 const statusColor: Record<string, "warning" | "success" | "error"> = {
   PENDING: "warning",
@@ -50,7 +93,7 @@ export default function AccountOrderDetailPage() {
     );
   }
 
-  const o = order as any;
+  const o = order as IOrderDetail;
   const payment = o.payment ?? o.payments?.[0];
 
   return (
@@ -105,14 +148,16 @@ export default function AccountOrderDetailPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {(o.items ?? []).map((item: any) => (
+              {(o.items ?? []).map((item: IOrderItem) => (
                 <tr key={item.id}>
                   <td className="py-3 font-medium text-gray-800 dark:text-white/90">
                     <div className="flex items-center gap-3">
                       {item.product?.imageUrl && (
-                        <img
+                        <Image
                           src={item.product.imageUrl}
                           alt={item.product?.name}
+                          width={40}
+                          height={40}
                           className="h-10 w-10 rounded-lg object-cover"
                         />
                       )}

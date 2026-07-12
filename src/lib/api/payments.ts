@@ -23,7 +23,7 @@ export const paymentsApi = {
 
   // POST /payments — create payment (called by checkout flow)
   create: (orderId: string, provider: "STRIPE" | "BKASH") =>
-    apiClient.post<any>("/payments", { orderId, provider }),
+    apiClient.post<{ payment: IPayment }>("/payments", { orderId, provider }),
 
   // NOTE: There is no GET /payments list endpoint in the backend.
   // Admin payments list will show empty until backend adds:

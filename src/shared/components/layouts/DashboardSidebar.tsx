@@ -1,9 +1,8 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "@/shared/context/SidebarContext";
-import { useTheme } from "@/shared/context/ThemeContext";
 import { useAuthStore } from '@/lib/auth/authStore';
 import { authApi } from '@/lib/api/auth';
 import { useRouter } from 'next/navigation';
@@ -58,10 +57,8 @@ export default function DashboardSidebar() {
     toggleMobileSidebar,
     setIsHovered,
   } = useSidebar();
-  const { theme } = useTheme();
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<Set<string>>(new Set());
-  const contentRefs = useRef<Record<string, HTMLDivElement>>({});
   const { user, clearAuth } = useAuthStore();
   const router = useRouter();
 
@@ -103,10 +100,6 @@ export default function DashboardSidebar() {
   };
 
   const isMenuOpen = (name: string) => openMenus.has(name);
-  const contentHeight = (name: string) => {
-    const el = contentRefs.current[name];
-    return el ? el.scrollHeight : 0;
-  };
 
   const sidebarWidth = isMobileOpen
     ? "translate-x-0"
@@ -184,12 +177,9 @@ export default function DashboardSidebar() {
 
         {hasSubItems && (isExpanded || isHovered) && (
           <div
-            ref={(el) => {
-              if (el) contentRefs.current[item.name] = el;
-            }}
             className="overflow-hidden transition-all duration-300 ease-in-out"
             style={{
-              maxHeight: isOpen ? `${contentHeight(item.name)}px` : "0px",
+              maxHeight: isOpen ? "500px" : "0px",
             }}
           >
             <div className="mt-1 ml-9 flex flex-col gap-0.5">

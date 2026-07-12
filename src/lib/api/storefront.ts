@@ -1,5 +1,33 @@
 import { apiClient } from "./apiClient";
 
+interface IProduct {
+  id: string;
+  name: string;
+  sku?: string;
+  description: string | null;
+  price: number;
+  stock: number;
+  categoryId: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+  imageUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ICategory {
+  id: string;
+  name: string;
+  parentId: string | null;
+  imageUrl: string | null;
+  fileManagerId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  children?: ICategory[];
+}
+
 export const storefrontApi = {
   // GET /products (public)
   getProducts: (params: Record<string, string | number | undefined>) => {
@@ -11,7 +39,7 @@ export const storefrontApi = {
       ),
     ).toString();
     return apiClient.get<{
-      products: any[];
+      products: IProduct[];
       pagination: {
         total: number;
         page: number;
@@ -21,20 +49,20 @@ export const storefrontApi = {
     }>(`/products${query ? `?${query}` : ""}`);
   },
 
-  getProduct: (id: string) => apiClient.get<any>(`/products/${id}`),
+  getProduct: (id: string) => apiClient.get<IProduct>(`/products/${id}`),
 
   // GET /products/:id/recommendations
   getRecommendations: (id: string, limit = 4) =>
-    apiClient.get<{ items: any[] }>(
+    apiClient.get<{ items: IProduct[] }>(
       `/products/${id}/recommendations?limit=${limit}`,
     ),
 
   // GET /categories (returns nested tree)
-  getCategories: () => apiClient.get<any[]>("/categories"),
+  getCategories: () => apiClient.get<ICategory[]>("/categories"),
 
-  getCategory: (id: string) => apiClient.get<any>(`/categories/${id}`),
+  getCategory: (id: string) => apiClient.get<ICategory>(`/categories/${id}`),
 
   // GET /categories/:id/products
   getCategoryProducts: (id: string) =>
-    apiClient.get<any>(`/categories/${id}/products`),
+    apiClient.get<{ products: IProduct[] }>(`/categories/${id}/products`),
 };

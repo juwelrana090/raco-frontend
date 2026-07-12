@@ -15,7 +15,9 @@ export default function AuthGuard({
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setHydrated(true);
+    // Use setTimeout to avoid synchronous setState during render
+    const timer = setTimeout(() => setHydrated(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {

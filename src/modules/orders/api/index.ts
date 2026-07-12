@@ -19,7 +19,7 @@ export const ordersApi = {
     apiClient.post<IOrder>("/orders", { items }),
 
   checkout: (id: string, provider: "STRIPE" | "BKASH") =>
-    apiClient.post<any>(`/orders/${id}/checkout`, { provider }),
+    apiClient.post<{ redirectUrl: string; provider: string }>(`/orders/${id}/checkout`, { provider }),
 
   cancel: (id: string) => apiClient.delete<IOrder>(`/orders/${id}`),
 };

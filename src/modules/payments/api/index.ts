@@ -25,5 +25,5 @@ export const paymentsApi = {
     apiClient.get<IPayment[]>(`/payments/order/${orderId}`),
 
   create: (orderId: string, provider: "STRIPE" | "BKASH") =>
-    apiClient.post<any>("/payments", { orderId, provider }),
+    apiClient.post<{ payment: IPayment }>("/payments", { orderId, provider }),
 };

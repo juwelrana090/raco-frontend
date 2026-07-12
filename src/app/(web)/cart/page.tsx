@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useCartStore } from "@/lib/store/cartStore";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import BoxIcon from "@/shared/icons/BoxIcon";
@@ -50,9 +51,11 @@ export default function CartPage() {
                 {/* Thumbnail */}
                 <div className="h-16 w-16 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
                   {item.imageUrl ? (
-                    <img
+                    <Image
                       src={item.imageUrl}
                       alt={item.name}
+                      width={64}
+                      height={64}
                       className="h-full w-full object-cover"
                     />
                   ) : (

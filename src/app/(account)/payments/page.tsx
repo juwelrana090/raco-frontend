@@ -46,7 +46,7 @@ export default function AccountPaymentsPage() {
       }),
   });
 
-  const payments: any[] = Array.isArray(data) ? (data as any[]) : [];
+  const payments = Array.isArray(data) ? data : [];
   const total: number = payments.length;
 
   return (

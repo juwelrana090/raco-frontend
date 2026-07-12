@@ -20,7 +20,23 @@ function formatPrice(price: number): string {
   return `৳ ${(price / 100).toLocaleString()}`;
 }
 
-const orderColumns: ColumnsType<any> = [
+interface IOrderItem {
+  id: string;
+  productId: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+}
+
+interface IOrder {
+  id: string;
+  items: IOrderItem[];
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+}
+
+const orderColumns: ColumnsType<IOrder> = [
   {
     title: "Order ID",
     dataIndex: "id",
@@ -33,7 +49,7 @@ const orderColumns: ColumnsType<any> = [
   {
     title: "Items",
     dataIndex: "items",
-    render: (items: any[]) => (
+    render: (items: IOrderItem[]) => (
       <span className="text-sm text-gray-600 dark:text-gray-300">
         {items?.length ?? 0}
       </span>
@@ -68,7 +84,7 @@ const orderColumns: ColumnsType<any> = [
   },
   {
     title: "Actions",
-    render: (_: unknown, record: any) => (
+    render: (_: unknown, record: IOrder) => (
       <Link
         href={`/admin/orders/${record.id}`}
         className="text-sm text-brand-500 hover:text-brand-600"
@@ -85,7 +101,7 @@ export default function UserDetailPage() {
   const { data: user, isLoading: userLoading } = useFetchUser(id);
   const { data: ordersData, isLoading: ordersLoading } = useFetchUserOrders(id);
 
-  const orders: any[] = (ordersData as any)?.items ?? [];
+  const orders = (ordersData as { items?: IOrder[] } | undefined)?.items ?? [];
 
   if (userLoading) {
     return (
@@ -124,29 +140,29 @@ export default function UserDetailPage() {
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Name</p>
             <p className="mt-1 text-sm font-medium text-gray-800 dark:text-white/90">
-              {(user as any).name}
+              {user?.name}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
             <p className="mt-1 text-sm font-medium text-gray-800 dark:text-white/90">
-              {(user as any).email}
+              {user?.email}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Role</p>
             <div className="mt-1">
               <Badge
-                color={(user as any).role === "ADMIN" ? "primary" : "light"}
+                color={user?.role === "ADMIN" ? "primary" : "light"}
               >
-                {(user as any).role}
+                {user?.role}
               </Badge>
             </div>
           </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Joined</p>
             <p className="mt-1 text-sm font-medium text-gray-800 dark:text-white/90">
-              {dayjs((user as any).createdAt).format("DD MMM YYYY")}
+              {dayjs(user?.createdAt).format("DD MMM YYYY")}
             </p>
           </div>
         </div>

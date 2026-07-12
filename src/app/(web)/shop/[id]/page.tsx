@@ -4,11 +4,27 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import Image from "next/image";
 import { storefrontApi } from "@/lib/api/storefront";
 import { useCartStore } from "@/lib/store/cartStore";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import Badge from "@/shared/components/ui/badge/Badge";
 import BoxIcon from "@/shared/icons/BoxIcon";
+
+interface IProduct {
+  id: string;
+  name: string;
+  sku?: string | undefined;
+  description: string | null;
+  price: number;
+  stock: number;
+  imageUrl: string | null;
+  categoryId: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+}
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -51,7 +67,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const p = product as any;
+  const p = product as IProduct;
   const inStock = p.stock > 0;
 
   const handleAddToCart = () => {
@@ -72,9 +88,11 @@ export default function ProductDetailPage() {
         {/* Left — Image */}
         <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
           {p.imageUrl ? (
-            <img
+            <Image
               src={p.imageUrl}
               alt={p.name}
+              width={400}
+              height={400}
               className="h-full w-full object-cover rounded-2xl"
             />
           ) : (

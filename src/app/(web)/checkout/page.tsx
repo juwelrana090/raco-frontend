@@ -10,6 +10,24 @@ import { formatPrice } from "@/shared/utils/formatPrice";
 
 type Provider = "stripe" | "bkash";
 
+interface IOrderResponse {
+  id: string;
+  data?: {
+    id: string;
+  };
+}
+
+interface ICheckoutResponse {
+  clientSecret?: string;
+  data?: {
+    clientSecret?: string;
+    bkashURL?: string;
+    paymentUrl?: string;
+  };
+  bkashURL?: string;
+  paymentUrl?: string;
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
@@ -49,10 +67,10 @@ export default function CheckoutPage() {
           quantity: i.quantity,
         })),
       };
-      const order = await apiClient.post<any>("/orders", orderPayload);
-      const orderId = (order as any).id ?? (order as any).data?.id;
+      const order = await apiClient.post<IOrderResponse>("/orders", orderPayload);
+      const orderId = order.id ?? order.data?.id;
 
-      const checkout = await apiClient.post<any>(
+      const checkout = await apiClient.post<ICheckoutResponse>(
         `/orders/${orderId}/checkout`,
         { provider },
       );
@@ -61,25 +79,26 @@ export default function CheckoutPage() {
 
       if (provider === "stripe") {
         const secret =
-          (checkout as any).clientSecret ??
-          (checkout as any).data?.clientSecret;
+          checkout.clientSecret ??
+          checkout.data?.clientSecret;
         router.push(
           `/checkout/success?orderId=${orderId}${secret ? `&secret=${secret}` : ""}`,
         );
       } else {
         const bkashUrl =
-          (checkout as any).bkashURL ??
-          (checkout as any).data?.bkashURL ??
-          (checkout as any).paymentUrl ??
-          (checkout as any).data?.paymentUrl;
+          checkout.bkashURL ??
+          checkout.data?.bkashURL ??
+          checkout.paymentUrl ??
+          checkout.data?.paymentUrl;
         if (bkashUrl) {
           window.location.href = bkashUrl;
         } else {
           router.push(`/checkout/success?orderId=${orderId}`);
         }
       }
-    } catch (err: any) {
-      toast.error(err?.message ?? "Failed to place order. Please try again.");
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message ?? "Failed to place order. Please try again.");
     } finally {
       setLoading(false);
     }

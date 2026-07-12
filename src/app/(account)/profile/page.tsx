@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -28,7 +28,7 @@ export default function ProfilePage() {
     queryFn: () => accountApi.getMe(),
   });
 
-  const me = (meData as any) ?? user;
+  const me = meData ?? user;
 
   const profileForm = useFormik({
     enableReinitialize: true,
@@ -44,8 +44,9 @@ export default function ProfilePage() {
           setAuth({ ...user, name: values.name }, token, refreshToken);
         }
         toast.success("Profile updated");
-      } catch (err: any) {
-        toast.error(err?.message ?? "Failed to update profile");
+      } catch (err) {
+        const error = err as Error;
+        toast.error(error.message ?? "Failed to update profile");
       }
     },
   });

@@ -34,7 +34,7 @@ export default function ProductsPage() {
   const handleDelete = async (id: string) => {
     try {
       await deleteMutation.mutateAsync(id);
-    } catch (error) {
+    } catch {
       // Error handled by mutation
     }
   };
@@ -85,7 +85,7 @@ export default function ProductsPage() {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      render: (category: any) => {
+      render: (category: { id: string; name: string } | undefined) => {
         const name = category?.name || "Unknown";
         return (
           <span className="inline-flex rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-500 dark:bg-brand-500/15 dark:text-brand-400">
@@ -197,7 +197,7 @@ export default function ProductsPage() {
             className="w-full sm:w-48"
             options={[
               { label: "All Categories", value: undefined },
-              ...categories.map((cat: any) => ({
+              ...categories.map((cat) => ({
                 label: cat.name,
                 value: cat.id,
               })),

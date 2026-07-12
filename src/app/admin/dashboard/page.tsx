@@ -3,16 +3,30 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { apiClient } from "@/lib/api/apiClient";
 
+interface IProductListResponse {
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data: Array<{
+    id: string;
+    name: string;
+    price: number;
+    stock: number;
+  }>;
+}
+
 export default function DashboardPage() {
   const { data: productsData } = useQuery({
     queryKey: ["admin-stats-products"],
-    queryFn: () => apiClient.get<any>("/products?limit=1"),
+    queryFn: () => apiClient.get<IProductListResponse>("/products?limit=1"),
   });
 
   const stats = [
     {
       label: "Total Products",
-      value: (productsData as any)?.pagination?.total ?? "-",
+      value: (productsData as IProductListResponse | undefined)?.pagination?.total ?? "-",
       href: "/admin/products",
       color: "text-brand-500",
     },

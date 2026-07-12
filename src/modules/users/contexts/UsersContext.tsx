@@ -43,8 +43,8 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     setFilters((prev) => ({ ...prev, page }));
   }, []);
 
-  const items: IUser[] = (data as any)?.items ?? [];
-  const total: number = (data as any)?.total ?? 0;
+  const items: IUser[] = (data as { items?: IUser[]; total?: number })?.items ?? [];
+  const total: number = (data as { items?: IUser[]; total?: number })?.total ?? 0;
   const limit = filters.limit ?? 10;
   const totalPages = Math.ceil(total / limit);
 

@@ -36,7 +36,7 @@ export default function AccountOrdersPage() {
       }),
   });
 
-  const orders: any[] = Array.isArray(data) ? (data as any[]) : [];
+  const orders = Array.isArray(data) ? data : [];
   const total: number = orders.length;
 
   return (

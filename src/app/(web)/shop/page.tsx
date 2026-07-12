@@ -6,6 +6,35 @@ import { Pagination } from "antd";
 import { storefrontApi } from "@/lib/api/storefront";
 import ProductCard from "@/shared/components/storefront/ProductCard";
 
+interface IProduct {
+  id: string;
+  name: string;
+  sku?: string | undefined;
+  description: string | null;
+  price: number;
+  stock: number;
+  imageUrl: string | null;
+  categoryId: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+}
+
+interface IProductsResponse {
+  products: IProduct[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+}
+
+interface ICategory {
+  id: string;
+  name: string;
+}
+
 function ShopContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -23,7 +52,7 @@ function ShopContent() {
         status: "ACTIVE",
         page,
         limit: 12,
-      } as any),
+      }),
   });
 
   const { data: categoriesData } = useQuery({
@@ -31,10 +60,10 @@ function ShopContent() {
     queryFn: () => storefrontApi.getCategories(),
   });
 
-  const products: any[] = (productsData as any)?.products ?? [];
-  const total: number = (productsData as any)?.pagination?.total ?? 0;
-  const categories: any[] = Array.isArray(categoriesData)
-    ? (categoriesData as any[])
+  const products = (productsData as IProductsResponse | undefined)?.products ?? [];
+  const total = (productsData as IProductsResponse | undefined)?.pagination?.total ?? 0;
+  const categories = Array.isArray(categoriesData)
+    ? (categoriesData as ICategory[])
     : [];
 
   useEffect(() => {
@@ -45,7 +74,7 @@ function ShopContent() {
     router.replace(`/shop${params.toString() ? `?${params}` : ""}`, {
       scroll: false,
     });
-  }, [search, category, page]);
+  }, [search, category, page, router]);
 
   const clearFilters = () => {
     setSearch("");
@@ -101,7 +130,7 @@ function ShopContent() {
             className="h-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 text-sm text-gray-700 dark:text-white/90 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           >
             <option value="">All Categories</option>
-            {categories.map((cat: any) => (
+            {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
               </option>

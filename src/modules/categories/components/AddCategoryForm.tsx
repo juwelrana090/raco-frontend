@@ -91,16 +91,17 @@ export default function AddCategoryForm({ categories }: AddCategoryFormProps) {
         description: values.description || undefined,
         parentId: values.parentId ?? undefined,
       });
-      const categoryId = (category as any)?.id;
+      const categoryId = category?.id;
 
       // Step 2: Upload image if selected
       if (selectedFile && categoryId) {
         setUploadingImage(true);
         try {
           await categoriesApi.uploadImage(categoryId, selectedFile);
-        } catch (err: any) {
+        } catch (err) {
+          const error = err as Error;
           toast.error(
-            `Category created but image upload failed: ${err.message}`,
+            `Category created but image upload failed: ${error.message}`,
           );
         } finally {
           setUploadingImage(false);

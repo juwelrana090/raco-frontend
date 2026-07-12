@@ -32,13 +32,13 @@ export default function AccountDashboardPage() {
   });
 
   const allOrders = Array.isArray(allOrdersData)
-    ? (allOrdersData as any[])
+    ? allOrdersData
     : [];
   const pendingOrdersList = Array.isArray(pendingData)
-    ? (pendingData as any[])
+    ? pendingData
     : [];
-  const recentOrders: any[] = Array.isArray(recentOrdersData)
-    ? (recentOrdersData as any[])
+  const recentOrders = Array.isArray(recentOrdersData)
+    ? recentOrdersData
     : [];
 
   const totalOrders = allOrders.length;

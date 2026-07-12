@@ -26,6 +26,6 @@ export const userApi = {
 
   getById: (id: string) => apiClient.get<IUser>(`/users/${id}`),
 
-  updateRole: (_id: string, _role: "USER" | "ADMIN") =>
+  updateRole: (id: string, role: "USER" | "ADMIN") =>
     Promise.reject(new Error("Role update endpoint not yet available")),
 };

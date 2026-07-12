@@ -1,7 +1,7 @@
 import { apiClient } from '@/lib/api/apiClient';
 import type { IProduct, IProductListResponse, IProductFilters } from '../types';
 
-function buildQuery(filters?: Record<string, any>): string {
+function buildQuery(filters?: IProductFilters | Record<string, string | number | undefined>): string {
   if (!filters) return '';
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([k, v]) => {
@@ -18,7 +18,7 @@ export const productsApi = {
   getById: (id: string) => apiClient.get<IProduct>(`/products/${id}`),
 
   getRecommendations: (id: string, limit?: number) =>
-    apiClient.get<any>(`/products/${id}/recommendations${limit ? `?limit=${limit}` : ''}`),
+    apiClient.get<{ products: IProduct[] }>(`/products/${id}/recommendations${limit ? `?limit=${limit}` : ''}`),
 
   create: (data: {
     sku: string;

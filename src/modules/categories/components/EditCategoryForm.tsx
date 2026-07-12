@@ -98,8 +98,9 @@ export default function EditCategoryForm({
       toast.success("Image uploaded successfully");
       handleCancelNewFile();
       refetch();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to upload image");
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message || "Failed to upload image");
     } finally {
       setUploadingImage(false);
     }
@@ -113,8 +114,9 @@ export default function EditCategoryForm({
       await categoriesApi.deleteImage(categoryId);
       toast.success("Image deleted");
       refetch();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to delete image");
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message || "Failed to delete image");
     } finally {
       setDeletingImage(false);
     }

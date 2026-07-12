@@ -104,8 +104,9 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
       toast.success("Image uploaded successfully");
       handleCancelNewFile();
       refetch();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to upload image");
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message || "Failed to upload image");
     } finally {
       setUploadingImage(false);
     }
@@ -119,8 +120,9 @@ export default function EditProductForm({ categories }: EditProductFormProps) {
       await productsApi.deleteImage(productId);
       toast.success("Image deleted");
       refetch();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to delete image");
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message || "Failed to delete image");
     } finally {
       setDeletingImage(false);
     }

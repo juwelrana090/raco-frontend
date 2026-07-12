@@ -14,7 +14,7 @@ export const categoriesApi = {
   getById: (id: string) => apiClient.get<ICategory>(`/categories/${id}`),
 
   getCategoryProducts: (id: string) =>
-    apiClient.get<any>(`/categories/${id}/products`),
+    apiClient.get<{ products: Array<{ id: string; name: string; price: number; stock: number }> }>(`/categories/${id}/products`),
 
   create: (data: { name: string; description?: string; parentId?: string }) =>
     apiClient.post<ICategory>('/categories', data),

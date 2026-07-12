@@ -34,7 +34,7 @@ export interface IProductFilters {
   categoryId?: string;
 }
 
-function buildQuery(filters?: Record<string, any>): string {
+function buildQuery(filters?: IProductFilters | Record<string, string | number | undefined>): string {
   if (!filters) return "";
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([k, v]) => {
@@ -53,7 +53,7 @@ export const productApi = {
 
   // GET /products/:id/recommendations
   getRecommendations: (id: string, limit?: number) =>
-    apiClient.get<any>(
+    apiClient.get<IProduct[]>(
       `/products/${id}/recommendations${limit ? `?limit=${limit}` : ""}`,
     ),
 

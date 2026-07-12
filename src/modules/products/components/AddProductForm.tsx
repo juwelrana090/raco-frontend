@@ -97,16 +97,17 @@ export default function AddProductForm({ categories }: AddProductFormProps) {
     try {
       // Step 1: Create product
       const product = await createProduct.mutateAsync(values);
-      const productId = (product as any)?.id;
+      const productId = product?.id;
 
       // Step 2: Upload image if a file was selected
       if (selectedFile && productId) {
         setUploadingImage(true);
         try {
           await productsApi.uploadImage(productId, selectedFile);
-        } catch (err: any) {
+        } catch (err) {
+          const error = err as Error;
           toast.error(
-            `Product created but image upload failed: ${err.message}`,
+            `Product created but image upload failed: ${error.message}`,
           );
         } finally {
           setUploadingImage(false);
