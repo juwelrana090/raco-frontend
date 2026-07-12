@@ -33,6 +33,11 @@ interface IProductsResponse {
 interface ICategory {
   id: string;
   name: string;
+  children?: ICategory[];
+}
+
+function flattenCategories(cats: ICategory[]): ICategory[] {
+  return cats.flatMap((c) => [c, ...flattenCategories(c.children ?? [])]);
 }
 
 function ShopContent() {
@@ -49,7 +54,6 @@ function ShopContent() {
       storefrontApi.getProducts({
         search: search || undefined,
         categoryId: category || undefined,
-        status: "ACTIVE",
         page,
         limit: 12,
       }),
@@ -63,7 +67,7 @@ function ShopContent() {
   const products = (productsData as IProductsResponse | undefined)?.products ?? [];
   const total = (productsData as IProductsResponse | undefined)?.pagination?.total ?? 0;
   const categories = Array.isArray(categoriesData)
-    ? (categoriesData as ICategory[])
+    ? flattenCategories(categoriesData as ICategory[])
     : [];
 
   useEffect(() => {

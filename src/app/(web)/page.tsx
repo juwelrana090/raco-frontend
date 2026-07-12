@@ -59,7 +59,7 @@ export default function HomePage() {
   const { data: productsData, isLoading: productsLoading } = useQuery({
     queryKey: ["storefront-featured"],
     queryFn: () =>
-      storefrontApi.getProducts({ limit: 8, status: "ACTIVE" }),
+      storefrontApi.getProducts({ limit: 8 }),
   });
 
   const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
