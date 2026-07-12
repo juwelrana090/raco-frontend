@@ -4,6 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "@/shared/context/SidebarContext";
 import { useTheme } from "@/shared/context/ThemeContext";
+import { useAuthStore } from '@/lib/auth/authStore';
+import { authApi } from '@/lib/api/auth';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 import GridIcon from "@/shared/icons/GridIcon";
 import BoxIcon from "@/shared/icons/BoxIcon";
 import CategoryIcon from "@/shared/icons/CategoryIcon";
@@ -58,6 +62,20 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<Set<string>>(new Set());
   const contentRefs = useRef<Record<string, HTMLDivElement>>({});
+  const { user, clearAuth } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const refreshToken = Cookies.get('raco_refresh') ?? '';
+      if (refreshToken) {
+        await authApi.logout(refreshToken).catch(() => {});
+      }
+    } finally {
+      clearAuth();
+      router.push('/auth/login');
+    }
+  };
 
   useEffect(() => {
     managementNav.forEach((item) => {
@@ -250,20 +268,73 @@ export default function DashboardSidebar() {
 
         {/* Footer */}
         {(isExpanded || isHovered) && (
-          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 dark:border-gray-800">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-brand-600">
-                <span className="text-sm font-medium">A</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Admin User
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  admin@raco.com
-                </p>
+          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-800">
+            {/* User info */}
+            <div className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+                  <span className="text-sm font-medium">
+                    {user?.name?.[0]?.toUpperCase() ?? 'A'}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {user?.name ?? 'Admin User'}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {user?.email ?? 'admin@raco.com'}
+                  </p>
+                </div>
               </div>
             </div>
+
+            {/* Logout button */}
+            <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-error-50 hover:text-error-600 dark:text-gray-400 dark:hover:bg-error-500/10 dark:hover:text-error-400 transition-colors"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                  />
+                </svg>
+                Logout
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Collapsed logout button */}
+        {!(isExpanded || isHovered) && (
+          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-800 p-4">
+            <button
+              onClick={handleLogout}
+              className="flex w-full items-center justify-center rounded-lg px-3 py-2.5 text-gray-600 hover:bg-error-50 hover:text-error-600 dark:text-gray-400 dark:hover:bg-error-500/10 dark:hover:text-error-400 transition-colors"
+              title="Logout"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                />
+              </svg>
+            </button>
           </div>
         )}
       </aside>

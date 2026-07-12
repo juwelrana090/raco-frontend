@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useAuthStore } from "@/lib/auth/authStore";
 import { useCartStore } from "@/lib/store/cartStore";
 import { useRouter } from "next/navigation";
+import { authApi } from '@/lib/api/auth';
+import Cookies from 'js-cookie';
 
 export default function StorefrontHeader() {
   const { isAuthenticated, user, clearAuth } = useAuthStore();
@@ -16,6 +18,20 @@ export default function StorefrontHeader() {
     e.preventDefault();
     if (search.trim())
       router.push(`/shop?search=${encodeURIComponent(search.trim())}`);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const refreshToken = Cookies.get('raco_refresh') ?? '';
+      if (refreshToken) {
+        await authApi.logout(refreshToken).catch(() => {
+          // Ignore backend errors — always clear local state
+        });
+      }
+    } finally {
+      clearAuth();
+      router.push('/auth/login');
+    }
   };
 
   return (
@@ -102,7 +118,7 @@ export default function StorefrontHeader() {
                   <span className="max-w-[80px] truncate">{user?.name}</span>
                 </Link>
                 <button
-                  onClick={clearAuth}
+                  onClick={handleLogout}
                   className="hidden sm:block text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 px-2"
                 >
                   Logout

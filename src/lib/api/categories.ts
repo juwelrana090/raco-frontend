@@ -5,6 +5,8 @@ export interface ICategory {
   name: string;
   description: string | null;
   parentId: string | null;
+  imageUrl: string | null; // ← ADD: category image CDN URL
+  fileManagerId: number | null; // ← ADD: FK to file_manager table
   parent: ICategory | null;
   children?: ICategory[];
   productCount: number;
@@ -51,4 +53,35 @@ export const categoryApi = {
     apiClient.patch<ICategory>(`/categories/${id}`, data),
 
   delete: (id: string) => apiClient.delete<void>(`/categories/${id}`),
+
+  // POST /categories/:id/image — multipart/form-data, Admin only
+  // Must use raw fetch — apiClient forces JSON Content-Type
+  uploadImage: async (
+    id: string,
+    file: File,
+  ): Promise<{ imageUrl: string }> => {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
+    const token =
+      typeof document !== "undefined"
+        ? document.cookie
+            .split("; ")
+            .find((r) => r.startsWith("raco_token="))
+            ?.split("=")[1]
+        : "";
+    const form = new FormData();
+    form.append("image", file);
+    const res = await fetch(`${baseUrl}/categories/${id}/image`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message ?? "Upload failed");
+    return json.data;
+  },
+
+  // DELETE /categories/:id/image — Admin only
+  deleteImage: (id: string) =>
+    apiClient.delete<void>(`/categories/${id}/image`),
 };

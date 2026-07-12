@@ -3,6 +3,8 @@ export interface ICategory {
   name: string;
   description?: string | null;
   parentId?: string | null;
+  imageUrl?: string | null;
+  fileManagerId?: number | null;
   children?: ICategory[];
   createdAt: string;
   updatedAt: string;

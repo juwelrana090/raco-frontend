@@ -2,9 +2,12 @@
 import { useRouter, useParams } from "next/navigation";
 import { Formik, Form, Field, type FormikHelpers } from "formik";
 import * as Yup from "yup";
+import { useRef, useState } from "react";
 import { useFetchCategory } from "../hooks/useFetchCategories";
 import { useUpdateCategory } from "../hooks/useUpdateCategory";
+import { categoriesApi } from "../api";
 import ButtonLoader from "@/shared/components/ui/button/ButtonLoader";
+import { toast } from "react-toastify";
 
 const inputClass =
   "shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/20 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30";
@@ -25,15 +28,27 @@ interface CategoryFormValues {
 }
 
 interface EditCategoryFormProps {
-  categories: Array<{ id: string; name: string; children?: Array<{ id: string; name: string }> }>;
+  categories: Array<{
+    id: string;
+    name: string;
+    children?: Array<{ id: string; name: string }>;
+  }>;
 }
 
-export default function EditCategoryForm({ categories }: EditCategoryFormProps) {
+export default function EditCategoryForm({
+  categories,
+}: EditCategoryFormProps) {
   const router = useRouter();
   const params = useParams();
   const categoryId = params.id as string;
-  const { data: category, isLoading } = useFetchCategory(categoryId);
+  const { data: category, isLoading, refetch } = useFetchCategory(categoryId);
   const updateCategory = useUpdateCategory();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [deletingImage, setDeletingImage] = useState(false);
 
   const flattenedCategories = categories
     .flatMap((cat) => [
@@ -46,9 +61,68 @@ export default function EditCategoryForm({ categories }: EditCategoryFormProps) 
     ])
     .filter((cat) => cat.id !== categoryId);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (
+      ![
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+      ].includes(file.type)
+    ) {
+      toast.error("Only JPG, PNG, WEBP, GIF allowed");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be under 5MB");
+      return;
+    }
+    setSelectedFile(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const handleCancelNewFile = () => {
+    setSelectedFile(null);
+    setPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleUploadImage = async () => {
+    if (!selectedFile || !categoryId) return;
+    setUploadingImage(true);
+    try {
+      await categoriesApi.uploadImage(categoryId, selectedFile);
+      toast.success("Image uploaded successfully");
+      handleCancelNewFile();
+      refetch();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload image");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!categoryId) return;
+    if (!confirm("Delete the current category image?")) return;
+    setDeletingImage(true);
+    try {
+      await categoriesApi.deleteImage(categoryId);
+      toast.success("Image deleted");
+      refetch();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete image");
+    } finally {
+      setDeletingImage(false);
+    }
+  };
+
   const handleSubmit = async (
     values: CategoryFormValues,
-    { setSubmitting }: FormikHelpers<CategoryFormValues>
+    { setSubmitting }: FormikHelpers<CategoryFormValues>,
   ) => {
     try {
       await updateCategory.mutateAsync({
@@ -61,6 +135,7 @@ export default function EditCategoryForm({ categories }: EditCategoryFormProps) 
       });
       router.push("/admin/categories");
     } catch {
+      // error handled in hook
     } finally {
       setSubmitting(false);
     }
@@ -94,6 +169,7 @@ export default function EditCategoryForm({ categories }: EditCategoryFormProps) 
     >
       {({ errors, touched, isSubmitting }) => (
         <Form className="space-y-6">
+          {/* ── Category Information ──────────────────────────────── */}
           <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
             <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
               Category Information
@@ -103,7 +179,11 @@ export default function EditCategoryForm({ categories }: EditCategoryFormProps) 
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Name *
                 </label>
-                <Field name="name" className={inputClass} placeholder="Category name" />
+                <Field
+                  name="name"
+                  className={inputClass}
+                  placeholder="Category name"
+                />
                 {errors.name && touched.name && (
                   <p className="mt-1 text-xs text-error-500">{errors.name}</p>
                 )}
@@ -137,6 +217,171 @@ export default function EditCategoryForm({ categories }: EditCategoryFormProps) 
             </div>
           </div>
 
+          {/* ── Category Image ─────────────────────────────────────── */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+            <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
+              Category Image
+              <span className="ml-2 text-xs font-normal text-gray-400">
+                JPG, PNG, WEBP, GIF · max 5MB
+              </span>
+            </h3>
+
+            {/* Existing image — no new file selected */}
+            {category.imageUrl && !preview && (
+              <div className="mb-4 flex items-start gap-4">
+                <img
+                  src={category.imageUrl}
+                  alt="Current"
+                  className="h-28 w-28 rounded-xl object-cover border border-gray-200 dark:border-gray-700"
+                />
+                <div className="flex flex-col gap-2 pt-1">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Current image
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-600"
+                  >
+                    <svg
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                      />
+                    </svg>
+                    Replace image
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteImage}
+                    disabled={deletingImage}
+                    className="flex items-center gap-1 text-xs text-error-500 hover:text-error-600 disabled:opacity-50"
+                  >
+                    <svg
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                      />
+                    </svg>
+                    {deletingImage ? "Deleting..." : "Delete image"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* New file selected — preview + Upload Now */}
+            {preview && (
+              <div className="mb-4 flex items-start gap-4">
+                <img
+                  src={preview}
+                  alt="New"
+                  className="h-28 w-28 rounded-xl object-cover border-2 border-brand-400"
+                />
+                <div className="flex flex-col gap-2 pt-1">
+                  <p className="text-xs font-medium text-brand-500">
+                    New image ready to upload
+                  </p>
+                  <p className="text-xs text-gray-400">{selectedFile?.name}</p>
+                  <p className="text-xs text-gray-400">
+                    {selectedFile
+                      ? (selectedFile.size / 1024).toFixed(1) + " KB"
+                      : ""}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleUploadImage}
+                    disabled={uploadingImage}
+                    className="flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600 disabled:bg-brand-300 transition-colors"
+                  >
+                    {uploadingImage && (
+                      <svg
+                        className="h-3 w-3 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
+                      </svg>
+                    )}
+                    {uploadingImage ? "Uploading..." : "Upload Now"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelNewFile}
+                    className="text-xs text-error-500 hover:text-error-600"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* No image — show upload area */}
+            {!category.imageUrl && !preview && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 p-8 text-center hover:border-brand-400 hover:bg-brand-50 dark:hover:border-brand-600 dark:hover:bg-brand-500/5 transition-colors cursor-pointer"
+              >
+                <svg
+                  className="h-10 w-10 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                  />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Click to upload category image
+                  </p>
+                  <p className="mt-1 text-xs text-gray-400">
+                    PNG, JPG, WEBP, GIF up to 5MB
+                  </p>
+                </div>
+              </button>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </div>
+
+          {/* ── Actions ───────────────────────────────────────────── */}
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
@@ -148,7 +393,7 @@ export default function EditCategoryForm({ categories }: EditCategoryFormProps) 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-brand-500 hover:bg-brand-600 disabled:bg-brand-300 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white"
+              className="bg-brand-500 hover:bg-brand-600 disabled:bg-brand-300 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-colors"
             >
               {isSubmitting && <ButtonLoader />}
               {isSubmitting ? "Saving..." : "Save Changes"}
